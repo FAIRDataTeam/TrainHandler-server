@@ -1,0 +1,109 @@
+name: "Code Style"
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  checkstyle:
+    name: Checkstyle
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_DISTRIBUTION: microsoft
+      JAVA_VERSION: 17
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # (1) -> Prepare cache
+      - name: Cache ~/.m2
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-${{ env.JAVA_VERSION }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      # (2) -> Prepare Java
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Verify Maven and Java
+        run: |
+          mvn --version
+
+      # (3) -> Run checkstyle
+      - name: Run Checkstyle
+        run: |
+          mvn -B checkstyle:checkstyle
+
+  spotbugs:
+    name: SpotBugs
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_DISTRIBUTION: microsoft
+      JAVA_VERSION: 17
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # (1) -> Prepare cache
+      - name: Cache ~/.m2
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-${{ env.JAVA_VERSION }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      # (2) -> Prepare Java
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Verify Maven and Java
+        run: |
+          mvn --version
+
+      # (3) -> Run SpotBugs
+      - name: Run SpotBugs
+        run: |
+          mvn -B spotbugs:check
+
+  license-head:
+    name: License Headers
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_DISTRIBUTION: microsoft
+      JAVA_VERSION: 17
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # (1) -> Prepare cache
+      - name: Cache ~/.m2
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-${{ env.JAVA_VERSION }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      # (2) -> Prepare Java
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Verify Maven and Java
+        run: |
+          mvn --version
+
+      # (3) -> Run license-maven-plugin
+      - name: Check license
+        run: |
+          mvn -B license:check
