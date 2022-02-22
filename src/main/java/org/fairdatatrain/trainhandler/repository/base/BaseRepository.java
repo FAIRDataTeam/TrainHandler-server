@@ -20,20 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.repository.base;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import java.util.UUID;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
+@NoRepositoryBean
+public interface BaseRepository<T> extends PagingAndSortingRepository<T, UUID> {
 }

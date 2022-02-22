@@ -20,20 +20,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.acceptance.helper;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class HelperPage<T> {
+
+	private List<T> content;
+
+	private int number;
+
+	private int size;
+
+	private int totalPages;
+
+	private int totalElements;
+
+	private int numberOfElements;
+
+	private boolean first;
+
+	private boolean last;
+
+	private boolean empty;
 
 }

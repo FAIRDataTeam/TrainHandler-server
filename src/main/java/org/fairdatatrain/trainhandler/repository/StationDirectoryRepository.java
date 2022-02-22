@@ -20,20 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.fairdatatrain.trainhandler.model.StationDirectory;
+import org.fairdatatrain.trainhandler.repository.base.BaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+@Repository
+public interface StationDirectoryRepository extends BaseRepository<StationDirectory> {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
+    Page<StationDirectory> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
 }

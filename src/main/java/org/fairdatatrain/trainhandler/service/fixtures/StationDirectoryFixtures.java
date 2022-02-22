@@ -20,20 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.service.fixtures;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationInfoDTO;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import java.util.Arrays;
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+public class StationDirectoryFixtures {
 
+    public static final StationInfoDTO STATION_A =
+            new StationInfoDTO("https://example.com/fdt/station/a", "Station A: Cancer Data CZ");
+    public static final StationInfoDTO STATION_B =
+            new StationInfoDTO("https://example.com/fdt/station/b", "Station B: Cancer Data NL");
+    public static final StationInfoDTO STATION_C =
+            new StationInfoDTO("https://example.com/fdt/station/c", "Station C: COVID Data EU");
+    public static final StationInfoDTO STATION_D =
+            new StationInfoDTO("https://example.com/fdt/station/d", "Station D: COVID Data NL");
+    public static final StationInfoDTO STATION_E =
+            new StationInfoDTO("https://example.com/fdt/station/e", "Station E: Random Data");
+
+    public static final List<StationInfoDTO> STATIONS =
+            Arrays.asList(STATION_A, STATION_B, STATION_C, STATION_D, STATION_E);
 }

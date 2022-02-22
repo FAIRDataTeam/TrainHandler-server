@@ -20,17 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.controller;
+package org.fairdatatrain.trainhandler.api.dto.traingarage;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.*;
 
-@RestController
-public class ExampleController {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-	@GetMapping(path = {"/"})
-	public String helloWorld() {
-		return "Hello, world!";
-	}
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainGarageChangeDTO {
+
+    @NotBlank
+    private String uri;
+
+    @NotBlank
+    private String displayName;
+
+    @NotNull
+    private String note;
+
 }
-

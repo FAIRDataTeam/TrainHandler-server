@@ -20,20 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.acceptance.actuator;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ActuatorInfoDTO {
+	@NotNull
+	@NotBlank
+	private String name;
 
+	@NotNull
+	@NotBlank
+	private String version;
+
+	@NotNull
+	@NotBlank
+	private String builtAt;
 }

@@ -20,20 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.service.actuator;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import static java.lang.String.format;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+@Component
+public class AppInfoContributor implements InfoContributor {
+
+    @Value("${git.branch}")
+    private String branch;
+
+    @Value("${git.commit.id.abbrev}")
+    private String commitShort;
+
+    @Value("${git.tags}")
+    private String tag;
+
+    @Value("${build.time}")
+    private String buildTime;
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("name", "FAIR Data Point");
+        builder.withDetail("version", getFdpVersion());
+        builder.withDetail("builtAt", buildTime);
+    }
+
+    public String getFdpVersion() {
+        String version = branch;
+        if (tag != null && !tag.isBlank()) {
+            version = tag;
+        }
+        return format("%s~%s", version, commitShort);
     }
 
 }

@@ -20,16 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.api.dto.stationdirectory;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import lombok.*;
 
-@SpringBootTest
-class ApplicationTests {
+import java.time.Instant;
+import java.util.UUID;
 
-	@Test
-	void contextLoads() {
-	}
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class StationDirectoryDTO {
+
+    private UUID uuid;
+
+    private String uri;
+
+    private String displayName;
+
+    private String note;
+
+    private String metadata;
+
+    private String status;
+
+    private Instant lastContact;
 
 }

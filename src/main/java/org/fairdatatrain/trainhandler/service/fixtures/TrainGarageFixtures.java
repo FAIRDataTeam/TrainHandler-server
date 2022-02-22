@@ -20,20 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.service.fixtures;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainInfoDTO;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import java.util.Arrays;
+import java.util.List;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+public class TrainGarageFixtures {
 
+    public static final TrainInfoDTO TRAIN_A =
+            new TrainInfoDTO("https://example.com/fdt/train/a", "Train A: Cancer SPARQL Express");
+    public static final TrainInfoDTO TRAIN_B =
+            new TrainInfoDTO("https://example.com/fdt/train/b", "Train B: Cancer SPARQL Slow");
+    public static final TrainInfoDTO TRAIN_C =
+            new TrainInfoDTO("https://example.com/fdt/train/c", "Train C: COVID Portal Analysis");
+    public static final TrainInfoDTO TRAIN_D =
+            new TrainInfoDTO("https://example.com/fdt/train/d", "Train D: COVID SPARQL Simple");
+
+    public static final List<TrainInfoDTO> TRAINS =
+            Arrays.asList(TRAIN_A, TRAIN_B, TRAIN_C, TRAIN_D);
 }

@@ -20,20 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.acceptance;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
+@SpringBootTest(
+		webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+		properties = {"spring.main.allow-bean-definition-overriding=true"}
+)
+@AutoConfigureMockMvc
+public abstract class WebIntegrationTest {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+	@Autowired
+	protected TestRestTemplate client;
 
 }

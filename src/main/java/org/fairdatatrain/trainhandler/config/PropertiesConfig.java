@@ -20,20 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.config;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+@Configuration
+public class PropertiesConfig {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+    private static final String GIT_FILE = "git.properties";
+
+    private static final String BUILD_INFO_FILE = "META-INF/build-info.properties";
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+        final PropertySourcesPlaceholderConfigurer propsConfig =
+                new PropertySourcesPlaceholderConfigurer();
+        propsConfig.setLocations(
+                new ClassPathResource(GIT_FILE),
+                new ClassPathResource(BUILD_INFO_FILE)
+        );
+        propsConfig.setIgnoreResourceNotFound(true);
+        propsConfig.setIgnoreUnresolvablePlaceholders(true);
+        return propsConfig;
     }
-
 }

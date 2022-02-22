@@ -15,3 +15,15 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     operationsSorter: alpha
+
+management:
+  health:
+    solr:
+      enabled:  false
+  info:
+    defaults:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health, info

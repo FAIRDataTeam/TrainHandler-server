@@ -35,6 +35,9 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
+# Mount point for rolling log files
+RUN mkdir /app/logs
+
 COPY --from=builder /builder/target/app.jar /app/app.jar
 COPY --from=builder /builder/target/classes/application.yml /app/application.yml
 

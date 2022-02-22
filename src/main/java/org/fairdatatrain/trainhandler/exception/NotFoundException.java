@@ -20,20 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.exception;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import java.util.Map;
+import java.util.UUID;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+@AllArgsConstructor
+@Getter
+public class NotFoundException extends Exception {
+
+    private final String entityName;
+
+    private final Map<String, String> fields;
+
+    public NotFoundException(String entityName, UUID uuid) {
+        this.entityName = entityName;
+        this.fields = Map.of("uuid", uuid.toString());
     }
-
 }

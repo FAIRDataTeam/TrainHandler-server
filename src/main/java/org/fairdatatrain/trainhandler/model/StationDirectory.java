@@ -20,20 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.model;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.fairdatatrain.trainhandler.model.base.BaseEntity;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+@Entity(name = "StationDirectory")
+@Table(name = "station_directory")
+@SuperBuilder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class StationDirectory extends BaseEntity {
 
+    @NotBlank
+    @NotNull
+    @Column(name = "uri", nullable = false)
+    private String uri;
+
+    @NotBlank
+    @NotNull
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
+
+    @NotNull
+    @Column(name = "note", nullable = false)
+    private String note;
+
+    @Column(name = "metadata")
+    private String metadata;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "last_contact")
+    private Timestamp lastContact;
 }

@@ -20,20 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler;
+package org.fairdatatrain.trainhandler.api.dto.traingarage;
+import lombok.*;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import java.time.Instant;
+import java.util.UUID;
 
-@SpringBootApplication
-@EnableWebMvc
-@ComponentScan(basePackages = "org.fairdatatrain.trainhandler.*")
-public class Application {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainGarageDTO {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+    private UUID uuid;
+
+    private String uri;
+
+    private String displayName;
+
+    private String note;
+
+    private String metadata;
+
+    private String status;
+
+    private Instant lastContact;
 
 }
+
