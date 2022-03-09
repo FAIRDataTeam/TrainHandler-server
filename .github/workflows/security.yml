@@ -22,41 +22,31 @@ jobs:
       JAVA_VERSION: 17
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Fetch all history for all tags and branches
-        run: git fetch --prune --unshallow
-
-      # (1) -> Prepare cache
-      - name: Cache ~/.m2
-        uses: actions/cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-${{ env.JAVA_VERSION }}-maven-${{ hashFiles('**/pom.xml') }}
+          fetch-depth: 0
 
-      # (2) -> Prepare Java
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
 
       - name: Verify Maven and Java
         run: |
           mvn --version
 
-      # (3) -> Init CodeQL
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
           languages: 'java'
 
-      # (3) -> Build
       - name: Build package
         run: |
           mvn --quiet -B -U --fail-fast -DskipTests package
 
-      # (4) -> CodeQL Analysis
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
 
