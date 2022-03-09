@@ -47,11 +47,11 @@ public class AppInfoContributor implements InfoContributor {
     @Override
     public void contribute(Info.Builder builder) {
         builder.withDetail("name", "FAIR Data Point");
-        builder.withDetail("version", getFdpVersion());
+        builder.withDetail("version", getAppVersion());
         builder.withDetail("builtAt", buildTime);
     }
 
-    public String getFdpVersion() {
+    public String getAppVersion() {
         String version = branch;
         if (tag != null && !tag.isBlank()) {
             version = tag;
