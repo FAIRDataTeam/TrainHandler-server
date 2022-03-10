@@ -81,13 +81,14 @@ public class StationDirectoryController {
         stationDirectoryService.delete(uuid);
     }
 
-    @PostMapping(
+    @GetMapping(
             path = "/search",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(code = HttpStatus.CREATED)
     public List<StationInfoDTO> search(
-            @RequestParam(value = "query", required = false, defaultValue = "") String query) {
+            @RequestParam(value = "query", required = false, defaultValue = "") String query
+    ) {
         return stationDirectoryService.search(query);
     }
 }
