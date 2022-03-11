@@ -1,0 +1,11 @@
+.github
+.idea
+LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+README.md
+SECURITY.md
+target/**
+!target/fdp-spring-boot.jar
+!target/classes/application-production.yml
+nb-configuration.xml

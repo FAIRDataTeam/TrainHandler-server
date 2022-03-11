@@ -10,6 +10,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Initiated Train Handler server project
+- Setup CI, code style checks, and security audits
 
 
 [Unreleased]: /../../compare/master...develop
