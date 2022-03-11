@@ -18,7 +18,7 @@ jobs:
       security-events: write
 
     env:
-      JAVA_DISTRIBUTION: microsoft
+      JAVA_DISTRIBUTION: temurin
       JAVA_VERSION: 17
 
     steps:

@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-FROM maven:3-openjdk-17-slim as builder
+FROM maven:3-eclipse-temurin-17-alpine as builder
 
 WORKDIR /builder
 
@@ -31,7 +31,7 @@ RUN mvn --quiet -B -U --fail-fast -DskipTests package
 
 ################################################################################
 # RUN STAGE
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-alpine
 
 WORKDIR /app
 
