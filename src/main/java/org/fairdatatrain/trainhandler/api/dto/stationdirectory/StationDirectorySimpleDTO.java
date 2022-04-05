@@ -20,13 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.repository.base;
+package org.fairdatatrain.trainhandler.api.dto.stationdirectory;
 
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import lombok.*;
 
 import java.util.UUID;
 
-@NoRepositoryBean
-public interface BaseRepository<T> extends PagingAndSortingRepository<T, UUID> {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class StationDirectorySimpleDTO {
+
+    private UUID uuid;
+
+    private String uri;
+
+    private String displayName;
 }

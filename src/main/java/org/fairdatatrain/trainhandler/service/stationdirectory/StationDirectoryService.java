@@ -25,17 +25,13 @@ package org.fairdatatrain.trainhandler.service.stationdirectory;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationInfoDTO;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.repository.StationDirectoryRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
-import org.fairdatatrain.trainhandler.repository.StationDirectoryRepository;
-import org.fairdatatrain.trainhandler.service.fixtures.StationDirectoryFixtures;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -88,18 +84,5 @@ public class StationDirectoryService {
                 stationDirectoryRepository.save(
                         stationDirectoryMapper.fromUpdateDTO(reqDto, stationDirectory));
         return this.stationDirectoryMapper.toDTO(updatedStationDirectory);
-    }
-
-    public List<StationInfoDTO> search(String query) {
-        // Dummy
-        final String finalQuery = query.toLowerCase(Locale.ROOT);
-        return StationDirectoryFixtures.STATIONS.stream()
-                .filter(
-                        station -> {
-                            return station.getDisplayName()
-                                    .toLowerCase(Locale.ROOT)
-                                    .contains(finalQuery);
-                        })
-                .toList();
     }
 }

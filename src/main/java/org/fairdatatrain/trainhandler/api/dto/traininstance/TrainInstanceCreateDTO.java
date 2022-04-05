@@ -20,16 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.repository;
+package org.fairdatatrain.trainhandler.api.dto.traininstance;
 
-import org.fairdatatrain.trainhandler.model.StationDirectory;
-import org.fairdatatrain.trainhandler.repository.base.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Repository
-public interface StationDirectoryRepository extends BaseRepository<StationDirectory> {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.UUID;
 
-    Page<StationDirectory> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class TrainInstanceCreateDTO {
+
+    @NotNull
+    private UUID trainUuid;
+
+    @NotNull
+    private List<UUID> stationUuids;
+
+    @NotBlank
+    private String displayName;
+
+    @NotNull
+    private String note;
 }

@@ -20,24 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.fixtures;
+package org.fairdatatrain.trainhandler.api.dto.train;
 
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainInfoDTO;
+import lombok.*;
+import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
 
-import java.util.Arrays;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-public class TrainGarageFixtures {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainDTO {
 
-    public static final TrainInfoDTO TRAIN_A =
-            new TrainInfoDTO("https://example.com/fdt/train/a", "Train A: Cancer SPARQL Express");
-    public static final TrainInfoDTO TRAIN_B =
-            new TrainInfoDTO("https://example.com/fdt/train/b", "Train B: Cancer SPARQL Slow");
-    public static final TrainInfoDTO TRAIN_C =
-            new TrainInfoDTO("https://example.com/fdt/train/c", "Train C: COVID Portal Analysis");
-    public static final TrainInfoDTO TRAIN_D =
-            new TrainInfoDTO("https://example.com/fdt/train/d", "Train D: COVID SPARQL Simple");
+    private UUID uuid;
 
-    public static final List<TrainInfoDTO> TRAINS =
-            Arrays.asList(TRAIN_A, TRAIN_B, TRAIN_C, TRAIN_D);
+    private String uri;
+
+    private String title;
+
+    private String description;
+
+    private List<String> keywords;
+
+    private String status;
+
+    private String metadata;
+
+    private TrainGarageSimpleDTO garage;
+
+    private List<TrainTypeSimpleDTO> types;
+
+    private Instant lastContactAt;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }

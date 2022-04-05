@@ -24,7 +24,8 @@ package org.fairdatatrain.trainhandler.service.stationdirectory;
 
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
+import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectorySimpleDTO;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -34,29 +35,30 @@ import java.util.Optional;
 @Component
 public class StationDirectoryMapper {
     public StationDirectoryDTO toDTO(StationDirectory stationDirectory) {
-        return new StationDirectoryDTO(
-                stationDirectory.getUuid(),
-                stationDirectory.getUri(),
-                stationDirectory.getDisplayName(),
-                stationDirectory.getNote(),
-                stationDirectory.getMetadata(),
-                stationDirectory.getStatus(),
-                Optional.ofNullable(stationDirectory.getLastContact())
-                        .map(Timestamp::toInstant)
-                        .orElse(null)
-        );
+        return StationDirectoryDTO.builder()
+                .uuid(stationDirectory.getUuid())
+                .uri(stationDirectory.getUri())
+                .displayName(stationDirectory.getDisplayName())
+                .note(stationDirectory.getNote())
+                .status(stationDirectory.getStatus())
+                .lastContactAt(
+                        Optional.ofNullable(stationDirectory.getLastContactAt())
+                                .map(Timestamp::toInstant)
+                                .orElse(null))
+                .createdAt(stationDirectory.getCreatedAt().toInstant())
+                .updatedAt(stationDirectory.getUpdatedAt().toInstant())
+                .build();
     }
 
     public StationDirectory fromCreateDTO(StationDirectoryChangeDTO reqDto) {
         final Timestamp now = Timestamp.from(Instant.now());
-        return StationDirectory
-                .builder()
+        return StationDirectory.builder()
                 .uri(reqDto.getUri())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
                 .status("NEW")
                 .metadata(null)
-                .lastContact(null)
+                .lastContactAt(null)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -72,5 +74,13 @@ public class StationDirectoryMapper {
         stationDirectory.setNote(reqDto.getNote());
         stationDirectory.setUpdatedAt(now);
         return stationDirectory;
+    }
+
+    public StationDirectorySimpleDTO toSimpleDTO(StationDirectory stationDirectory) {
+        return StationDirectorySimpleDTO.builder()
+                .uuid(stationDirectory.getUuid())
+                .uri(stationDirectory.getUri())
+                .displayName(stationDirectory.getDisplayName())
+                .build();
     }
 }

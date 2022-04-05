@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationInfoDTO;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.stationdirectory.StationDirectoryService;
 import org.springframework.data.domain.Page;
@@ -36,10 +35,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Station Directory")
+@Tag(name = "Station Directories")
 @RestController
 @RequestMapping("/station-directories")
 @RequiredArgsConstructor
@@ -79,16 +77,5 @@ public class StationDirectoryController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID uuid) throws NotFoundException {
         stationDirectoryService.delete(uuid);
-    }
-
-    @GetMapping(
-            path = "/search",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public List<StationInfoDTO> search(
-            @RequestParam(value = "query", required = false, defaultValue = "") String query
-    ) {
-        return stationDirectoryService.search(query);
     }
 }

@@ -23,7 +23,7 @@
 package org.fairdatatrain.trainhandler.acceptance.stationdirectory;
 
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -33,44 +33,44 @@ import java.util.UUID;
 
 public class StationDirectoryTestFixtures {
 
-    public static StationDirectory STATION_DIRECTORY_A = StationDirectory
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/station-directory/A")
-            .displayName("Station Directory A")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static StationDirectory STATION_DIRECTORY_A =
+            StationDirectory.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/station-directory/A")
+                    .displayName("Station Directory A")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
-    public static StationDirectory STATION_DIRECTORY_B = StationDirectory
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/station-directory/B")
-            .displayName("Station Directory B")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static StationDirectory STATION_DIRECTORY_B =
+            StationDirectory.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/station-directory/B")
+                    .displayName("Station Directory B")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
-    public static StationDirectory STATION_DIRECTORY_C = StationDirectory
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/station-directory/C")
-            .displayName("Station Directory C")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static StationDirectory STATION_DIRECTORY_C =
+            StationDirectory.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/station-directory/C")
+                    .displayName("Station Directory C")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
     public static StationDirectoryChangeDTO STATION_DIRECTORY_X_CREATE = StationDirectoryChangeDTO
             .builder()

@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainInfoDTO;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.traingarage.TrainGarageService;
 import org.springframework.data.domain.Page;
@@ -36,10 +35,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Train Garage")
+@Tag(name = "Train Garages")
 @RestController
 @RequestMapping("/train-garages")
 @RequiredArgsConstructor
@@ -79,16 +77,5 @@ public class TrainGarageController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID uuid) throws NotFoundException {
         trainGarageService.delete(uuid);
-    }
-
-    @GetMapping(
-            path = "/search",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public List<TrainInfoDTO> search(
-            @RequestParam(value = "query", required = false, defaultValue = "") String query
-    ) {
-        return trainGarageService.search(query);
     }
 }

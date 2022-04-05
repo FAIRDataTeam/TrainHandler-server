@@ -20,57 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.model.base;
+package org.fairdatatrain.trainhandler.api.dto.traintype;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
-import java.util.Objects;
+import java.time.Instant;
 import java.util.UUID;
 
-@MappedSuperclass
-@SuperBuilder
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseEntity {
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainTypeDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @NotNull
-    @Column(name = "uuid", nullable = false, updatable = false)
     private UUID uuid;
 
-    @CreationTimestamp
-    @NotNull
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private String uri;
 
-    @UpdateTimestamp
-    @NotNull
-    @Column(name = "updated_at", nullable = false)
-    private Timestamp updatedAt;
+    private String title;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final BaseEntity that = (BaseEntity) o;
-        return uuid.equals(that.uuid);
-    }
+    private String note;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(uuid);
-    }
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }

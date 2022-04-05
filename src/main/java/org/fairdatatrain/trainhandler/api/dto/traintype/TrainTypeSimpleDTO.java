@@ -20,46 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.model;
+package org.fairdatatrain.trainhandler.api.dto.traintype;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.fairdatatrain.trainhandler.model.base.BaseEntity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.util.UUID;
 
-@Entity(name = "StationDirectory")
-@Table(name = "station_directory")
-@SuperBuilder
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StationDirectory extends BaseEntity {
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainTypeSimpleDTO {
 
-    @NotBlank
-    @NotNull
-    @Column(name = "uri", nullable = false)
+    private UUID uuid;
+
     private String uri;
 
-    @NotBlank
-    @NotNull
-    @Column(name = "display_name", nullable = false)
-    private String displayName;
-
-    @NotNull
-    @Column(name = "note", nullable = false)
-    private String note;
-
-    @Column(name = "metadata")
-    private String metadata;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "last_contact")
-    private Timestamp lastContact;
+    private String title;
 }

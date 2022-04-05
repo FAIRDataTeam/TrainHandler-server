@@ -20,51 +20,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.model;
+package org.fairdatatrain.trainhandler.data.model.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.fairdatatrain.trainhandler.model.base.BaseEntity;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.Objects;
+import java.util.UUID;
 
-@Entity(name = "TrainGarage")
-@Table(name = "train_garage")
+@MappedSuperclass
+@SuperBuilder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-public class TrainGarage extends BaseEntity {
+public class BaseEntity {
 
-    @NotBlank
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @NotNull
-    @Column(name = "uri", nullable = false)
-    private String uri;
+    @Column(name = "uuid", nullable = false, updatable = false)
+    private UUID uuid;
 
-    @NotBlank
+    @CreationTimestamp
     @NotNull
-    @Column(name = "display_name", nullable = false)
-    private String displayName;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
 
+    @UpdateTimestamp
     @NotNull
-    @Column(name = "note", nullable = false)
-    private String note;
+    @Column(name = "updated_at", nullable = false)
+    private Timestamp updatedAt;
 
-    @Column(name = "metadata")
-    private String metadata;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final BaseEntity that = (BaseEntity) o;
+        return uuid.equals(that.uuid);
+    }
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "last_contact")
-    private Timestamp lastContact;
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
 }

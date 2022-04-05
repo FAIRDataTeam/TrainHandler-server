@@ -20,26 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.fixtures;
+package org.fairdatatrain.trainhandler.api.dto.traintype;
 
-import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationInfoDTO;
+import lombok.*;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-public class StationDirectoryFixtures {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainTypeChangeDTO {
+    @NotBlank
+    private String uri;
 
-    public static final StationInfoDTO STATION_A =
-            new StationInfoDTO("https://example.com/fdt/station/a", "Station A: Cancer Data CZ");
-    public static final StationInfoDTO STATION_B =
-            new StationInfoDTO("https://example.com/fdt/station/b", "Station B: Cancer Data NL");
-    public static final StationInfoDTO STATION_C =
-            new StationInfoDTO("https://example.com/fdt/station/c", "Station C: COVID Data EU");
-    public static final StationInfoDTO STATION_D =
-            new StationInfoDTO("https://example.com/fdt/station/d", "Station D: COVID Data NL");
-    public static final StationInfoDTO STATION_E =
-            new StationInfoDTO("https://example.com/fdt/station/e", "Station E: Random Data");
+    @NotBlank
+    private String title;
 
-    public static final List<StationInfoDTO> STATIONS =
-            Arrays.asList(STATION_A, STATION_B, STATION_C, STATION_D, STATION_E);
+    @NotNull
+    private String note;
 }

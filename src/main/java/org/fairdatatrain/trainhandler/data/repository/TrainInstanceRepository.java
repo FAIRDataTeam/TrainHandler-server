@@ -20,16 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.repository;
+package org.fairdatatrain.trainhandler.data.repository;
 
-import org.fairdatatrain.trainhandler.model.TrainGarage;
-import org.fairdatatrain.trainhandler.repository.base.BaseRepository;
+import org.fairdatatrain.trainhandler.data.model.TrainInstance;
+import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrainGarageRepository extends BaseRepository<TrainGarage> {
+public interface TrainInstanceRepository extends BaseRepository<TrainInstance> {
 
-    Page<TrainGarage> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
+    Page<TrainInstance> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
 }

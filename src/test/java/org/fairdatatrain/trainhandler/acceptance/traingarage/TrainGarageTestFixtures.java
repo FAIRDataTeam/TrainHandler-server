@@ -23,7 +23,7 @@
 package org.fairdatatrain.trainhandler.acceptance.traingarage;
 
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
-import org.fairdatatrain.trainhandler.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.model.TrainGarage;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -33,44 +33,44 @@ import java.util.UUID;
 
 public class TrainGarageTestFixtures {
 
-    public static TrainGarage TRAIN_GARAGE_A = TrainGarage
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/train-garage/A")
-            .displayName("Train Garage A")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static TrainGarage TRAIN_GARAGE_A =
+            TrainGarage.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/train-garage/A")
+                    .displayName("Train Garage A")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
-    public static TrainGarage TRAIN_GARAGE_B = TrainGarage
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/train-garage/B")
-            .displayName("Train Garage B")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static TrainGarage TRAIN_GARAGE_B =
+            TrainGarage.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/train-garage/B")
+                    .displayName("Train Garage B")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
-    public static TrainGarage TRAIN_GARAGE_C = TrainGarage
-            .builder()
-            .uuid(UUID.randomUUID())
-            .createdAt(Timestamp.from(Instant.now()))
-            .updatedAt(Timestamp.from(Instant.now()))
-            .uri("https://example.com/fdt/train-garage/C")
-            .displayName("Train Garage C")
-            .note("")
-            .metadata("")
-            .status("UNKNOWN")
-            .lastContact(Timestamp.from(Instant.now()))
-            .build();
+    public static TrainGarage TRAIN_GARAGE_C =
+            TrainGarage.builder()
+                    .uuid(UUID.randomUUID())
+                    .createdAt(Timestamp.from(Instant.now()))
+                    .updatedAt(Timestamp.from(Instant.now()))
+                    .uri("https://example.com/fdt/train-garage/C")
+                    .displayName("Train Garage C")
+                    .note("")
+                    .metadata("")
+                    .status("UNKNOWN")
+                    .lastContactAt(Timestamp.from(Instant.now()))
+                    .build();
 
     public static TrainGarageChangeDTO TRAIN_GARAGE_X_CREATE = TrainGarageChangeDTO
             .builder()

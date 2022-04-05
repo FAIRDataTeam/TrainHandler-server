@@ -24,7 +24,7 @@ package org.fairdatatrain.trainhandler.acceptance.traingarage;
 
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
-import org.fairdatatrain.trainhandler.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.model.TrainGarage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

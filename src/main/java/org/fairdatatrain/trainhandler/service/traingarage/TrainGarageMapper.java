@@ -24,7 +24,8 @@ package org.fairdatatrain.trainhandler.service.traingarage;
 
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
-import org.fairdatatrain.trainhandler.model.TrainGarage;
+import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
+import org.fairdatatrain.trainhandler.data.model.TrainGarage;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -34,29 +35,31 @@ import java.util.Optional;
 @Component
 public class TrainGarageMapper {
     public TrainGarageDTO toDTO(TrainGarage trainGarage) {
-        return new TrainGarageDTO(
-                trainGarage.getUuid(),
-                trainGarage.getUri(),
-                trainGarage.getDisplayName(),
-                trainGarage.getNote(),
-                trainGarage.getMetadata(),
-                trainGarage.getStatus(),
-                Optional.ofNullable(trainGarage.getLastContact())
-                        .map(Timestamp::toInstant)
-                        .orElse(null)
-        );
+        return TrainGarageDTO.builder()
+                .uuid(trainGarage.getUuid())
+                .uri(trainGarage.getUri())
+                .displayName(trainGarage.getDisplayName())
+                .note(trainGarage.getNote())
+                .metadata(trainGarage.getMetadata())
+                .status(trainGarage.getStatus())
+                .lastContactAt(
+                        Optional.ofNullable(trainGarage.getLastContactAt())
+                                .map(Timestamp::toInstant)
+                                .orElse(null))
+                .createdAt(trainGarage.getCreatedAt().toInstant())
+                .updatedAt(trainGarage.getCreatedAt().toInstant())
+                .build();
     }
 
     public TrainGarage fromCreateDTO(TrainGarageChangeDTO reqDto) {
         final Timestamp now = Timestamp.from(Instant.now());
-        return TrainGarage
-                .builder()
+        return TrainGarage.builder()
                 .uri(reqDto.getUri())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
                 .status("NEW")
                 .metadata(null)
-                .lastContact(null)
+                .lastContactAt(null)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -72,5 +75,13 @@ public class TrainGarageMapper {
         trainGarage.setNote(reqDto.getNote());
         trainGarage.setUpdatedAt(now);
         return trainGarage;
+    }
+
+    public TrainGarageSimpleDTO toSimpleDTO(TrainGarage trainGarage) {
+        return TrainGarageSimpleDTO.builder()
+                .uuid(trainGarage.getUuid())
+                .uri(trainGarage.getUri())
+                .displayName(trainGarage.getDisplayName())
+                .build();
     }
 }

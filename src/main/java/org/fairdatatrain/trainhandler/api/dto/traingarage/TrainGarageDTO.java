@@ -45,7 +45,10 @@ public class TrainGarageDTO {
 
     private String status;
 
-    private Instant lastContact;
+    private Instant lastContactAt;
 
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }
 
