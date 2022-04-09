@@ -21,33 +21,39 @@
 -- THE SOFTWARE.
 --
 
-CREATE TABLE IF NOT EXISTS train_instance
-(
-    uuid         UUID      NOT NULL
-        CONSTRAINT train_instance_pkey PRIMARY KEY,
-    display_name TEXT      NOT NULL,
-    note         TEXT      NOT NULL,
-    train_id     UUID      NOT NULL,
-    created_at   TIMESTAMP NOT NULL,
-    updated_at   TIMESTAMP NOT NULL
-);
+CREATE TYPE sync_service_status AS ENUM (
+    'SYNCED',
+    'SYNCING',
+    'UNREACHABLE',
+    'INVALID',
+    'DELETED'
+    );
 
-ALTER TABLE train_instance
-    ADD CONSTRAINT train_instance_train_fk FOREIGN KEY (train_id) REFERENCES train (uuid);
+CREATE CAST (character varying AS sync_service_status) WITH INOUT AS ASSIGNMENT;
 
-CREATE TABLE IF NOT EXISTS train_run
-(
-    uuid              UUID        NOT NULL
-        CONSTRAINT train_run_pkey PRIMARY KEY,
-    status            VARCHAR(50) NOT NULL,
-    station_id        UUID        NOT NULL,
-    train_instance_id UUID        NOT NULL,
-    created_at        TIMESTAMP   NOT NULL,
-    updated_at        TIMESTAMP   NOT NULL
-);
+ALTER TABLE station_directory
+    DROP COLUMN status;
+ALTER TABLE station_directory
+    ADD COLUMN status sync_service_status NOT NULL DEFAULT 'SYNCED';
 
-ALTER TABLE train_run
-    ADD CONSTRAINT train_run_station_fk FOREIGN KEY (station_id) REFERENCES station (uuid);
+ALTER TABLE train_garage
+    DROP COLUMN status;
+ALTER TABLE train_garage
+    ADD COLUMN status sync_service_status NOT NULL DEFAULT 'SYNCED';
 
-ALTER TABLE train_run
-    ADD CONSTRAINT train_run_train_instance_fk FOREIGN KEY (train_instance_id) REFERENCES train_instance (uuid);
+CREATE TYPE sync_item_status AS ENUM (
+    'SYNCED',
+    'DELETED'
+    );
+
+CREATE CAST (character varying AS sync_item_status) WITH INOUT AS ASSIGNMENT;
+
+ALTER TABLE train
+    DROP COLUMN status;
+ALTER TABLE train
+    ADD COLUMN status sync_item_status NOT NULL DEFAULT 'SYNCED';
+
+ALTER TABLE station
+    DROP COLUMN status;
+ALTER TABLE station
+    ADD COLUMN status sync_item_status NOT NULL DEFAULT 'SYNCED';

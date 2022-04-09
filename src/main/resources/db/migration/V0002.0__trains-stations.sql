@@ -29,7 +29,7 @@ ALTER TABLE train_garage
 CREATE TABLE IF NOT EXISTS train_type
 (
     uuid       UUID      NOT NULL
-        CONSTRAINT train_type_pkey PRIMARY KEY,
+        CONSTRAINT train_type_pk PRIMARY KEY,
     uri        TEXT      NOT NULL,
     title      TEXT      NOT NULL,
     note       TEXT      NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS train_type
 CREATE TABLE IF NOT EXISTS train
 (
     uuid            UUID      NOT NULL
-        CONSTRAINT train_pkey PRIMARY KEY,
+        CONSTRAINT train_pk PRIMARY KEY,
     uri             TEXT      NOT NULL,
     title           TEXT      NOT NULL,
     description     TEXT      NOT NULL,
@@ -59,7 +59,7 @@ ALTER TABLE train
 CREATE TABLE IF NOT EXISTS station
 (
     uuid                 UUID      NOT NULL
-        CONSTRAINT station_pkey PRIMARY KEY,
+        CONSTRAINT station_pk PRIMARY KEY,
     uri                  TEXT      NOT NULL,
     title                TEXT      NOT NULL,
     description          TEXT      NOT NULL,

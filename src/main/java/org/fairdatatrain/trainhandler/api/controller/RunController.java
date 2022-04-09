@@ -24,11 +24,15 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.traininstance.TrainInstanceCreateDTO;
-import org.fairdatatrain.trainhandler.api.dto.traininstance.TrainInstanceDTO;
-import org.fairdatatrain.trainhandler.api.dto.traininstance.TrainInstanceSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
+import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunUpdateDTO;
+import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.service.traininstance.TrainInstanceService;
+import org.fairdatatrain.trainhandler.service.job.JobService;
+import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -38,33 +42,48 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.UUID;
 
-@Tag(name = "Train Instances")
+@Tag(name = "Runs")
 @RestController
-@RequestMapping("/train-instances")
+@RequestMapping("/runs")
 @RequiredArgsConstructor
-public class TrainInstanceController {
+public class RunController {
 
-    private final TrainInstanceService trainInstanceService;
+    private final RunService runService;
 
-    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<TrainInstanceSimpleDTO> getPaged(
-            @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            Pageable pageable) {
-        return trainInstanceService.getPaged(query, pageable);
-    }
+    private final JobService jobService;
 
     @PostMapping(
             path = "",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = HttpStatus.CREATED)
-    public TrainInstanceDTO create(@Valid @RequestBody TrainInstanceCreateDTO reqDto)
-            throws NotFoundException {
-        return trainInstanceService.create(reqDto);
+    public RunDTO create(@Valid @RequestBody RunCreateDTO reqDto) throws NotFoundException {
+        return runService.create(reqDto);
     }
 
     @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public TrainInstanceDTO getSingle(@PathVariable UUID uuid) throws NotFoundException {
-        return trainInstanceService.getSingle(uuid);
+    public RunDTO getSingle(@PathVariable UUID uuid) throws NotFoundException {
+        return runService.getSingle(uuid);
+    }
+
+    @PutMapping(
+            path = "/{uuid}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public RunDTO update(@PathVariable UUID uuid, @Valid @RequestBody RunUpdateDTO reqDto)
+            throws NotFoundException, CannotPerformException {
+        // TODO: abort? duplicate?
+        return runService.update(uuid, reqDto);
+    }
+
+    @GetMapping(path = "/{runUuid}/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<JobSimpleDTO> getJobs(@PathVariable UUID runUuid, Pageable pageable) {
+        return jobService.getJobsForRun(runUuid, pageable);
+    }
+
+    @GetMapping(path = "/{runUuid}/jobs/{jobUuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JobDTO getJobs(@PathVariable UUID runUuid, @PathVariable UUID jobUuid)
+            throws NotFoundException {
+        return jobService.getSingle(runUuid, jobUuid);
     }
 }

@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -65,9 +66,9 @@ public class Train extends BaseEntity {
     @Column(name = "metadata")
     private String metadata;
 
-    @Column(name = "status")
-    private String status;
-    // TODO enum
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "sync_item_status", nullable = false)
+    private SyncItemStatus status;
 
     @NotNull
     @ManyToOne

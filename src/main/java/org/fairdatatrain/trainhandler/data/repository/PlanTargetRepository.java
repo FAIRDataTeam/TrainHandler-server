@@ -20,33 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.traininstance;
+package org.fairdatatrain.trainhandler.data.repository;
 
-import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.train.TrainDTO;
+import org.fairdatatrain.trainhandler.data.model.PlanTarget;
+import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
+import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class TrainInstanceDTO {
-
-    private UUID uuid;
-
-    private String displayName;
-
-    private String note;
-
-    private TrainDTO train;
-
-    private List<TrainRunSimpleDTO> runs;
-
-    private Instant createdAt;
-
-    private Instant updatedAt;
+@Repository
+public interface PlanTargetRepository extends BaseRepository<PlanTarget> {
 }

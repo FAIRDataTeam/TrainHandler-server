@@ -20,15 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.train;
+package org.fairdatatrain.trainhandler.api.dto.job;
 
 import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
+import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -36,29 +34,19 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class TrainDTO {
+public class JobSimpleDTO {
 
     private UUID uuid;
 
-    private String uri;
+    private String remoteId;
 
-    private String title;
+    private JobStatus status;
 
-    private String description;
+    private Instant startedAt;
 
-    private List<String> keywords;
+    private Instant finishedAt;
 
-    private SyncItemStatus status;
+    private StationSimpleDTO target;
 
-    private String metadata;
-
-    private TrainGarageSimpleDTO garage;
-
-    private List<TrainTypeSimpleDTO> types;
-
-    private Instant lastContactAt;
-
-    private Instant createdAt;
-
-    private Instant updatedAt;
+    private UUID runUuid;
 }

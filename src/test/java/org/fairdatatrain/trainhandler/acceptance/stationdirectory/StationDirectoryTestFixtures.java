@@ -24,6 +24,7 @@ package org.fairdatatrain.trainhandler.acceptance.stationdirectory;
 
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -42,7 +43,7 @@ public class StationDirectoryTestFixtures {
                     .displayName("Station Directory A")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 
@@ -55,7 +56,7 @@ public class StationDirectoryTestFixtures {
                     .displayName("Station Directory B")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 
@@ -68,7 +69,7 @@ public class StationDirectoryTestFixtures {
                     .displayName("Station Directory C")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 

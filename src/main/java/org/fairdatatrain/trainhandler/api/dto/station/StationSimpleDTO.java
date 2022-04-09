@@ -25,6 +25,7 @@ package org.fairdatatrain.trainhandler.api.dto.station;
 import lombok.*;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectorySimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class StationSimpleDTO {
 
     private List<String> keywords;
 
-    private String status;
+    private SyncItemStatus status;
 
     private StationDirectorySimpleDTO directory;
 

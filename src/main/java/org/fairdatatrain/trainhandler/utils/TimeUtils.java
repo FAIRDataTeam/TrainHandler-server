@@ -20,20 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.stationdirectory;
+package org.fairdatatrain.trainhandler.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.sql.Timestamp;
+import java.time.Instant;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-public class StationInfoDTO {
+public class TimeUtils {
 
-    private String uri;
-
-    private String displayName;
+    public static Timestamp now() {
+        return Timestamp.from(Instant.now());
+    }
 }

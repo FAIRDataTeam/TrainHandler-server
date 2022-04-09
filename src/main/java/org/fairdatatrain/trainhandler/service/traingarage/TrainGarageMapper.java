@@ -26,6 +26,7 @@ import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -57,7 +58,7 @@ public class TrainGarageMapper {
                 .uri(reqDto.getUri())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
-                .status("NEW")
+                .status(SyncServiceStatus.SYNCING)
                 .metadata(null)
                 .lastContactAt(null)
                 .createdAt(now)

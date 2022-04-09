@@ -26,6 +26,7 @@ import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryC
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectorySimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -56,7 +57,7 @@ public class StationDirectoryMapper {
                 .uri(reqDto.getUri())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
-                .status("NEW")
+                .status(SyncServiceStatus.SYNCING)
                 .metadata(null)
                 .lastContactAt(null)
                 .createdAt(now)

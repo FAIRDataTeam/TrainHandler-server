@@ -20,20 +20,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.traingarage;
+package org.fairdatatrain.trainhandler.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
-@NoArgsConstructor
-@AllArgsConstructor
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.List;
+
+@Entity(name = "Job")
+@Table(name = "job")
 @Getter
 @Setter
-public class TrainInfoDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class Job extends BaseEntity {
 
-    private String uri;
+    @NotNull
+    @Column(name = "secret", nullable = false)
+    private String secret;
 
-    private String displayName;
+    @Column(name = "remote_id")
+    private String remoteId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "job_status", nullable = false)
+    private JobStatus status;
+
+    @Column(name = "started_at")
+    private Timestamp startedAt;
+
+    @Column(name = "finished_at")
+    private Timestamp finishedAt;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "plan_target_id")
+    private PlanTarget target;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "run_id")
+    private Run run;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "job")
+    private List<JobEvent> events;
 }

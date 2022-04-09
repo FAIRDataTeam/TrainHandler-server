@@ -20,39 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.model;
+package org.fairdatatrain.trainhandler.service.plan;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.data.model.Plan;
+import org.fairdatatrain.trainhandler.data.model.PlanTarget;
+import org.fairdatatrain.trainhandler.data.model.Station;
+import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
-@Entity(name = "TrainRun")
-@Table(name = "train_run")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@SuperBuilder
-public class TrainRun extends BaseEntity {
+@Component
+@RequiredArgsConstructor
+public class PlanTargetMapper {
 
-    @NotNull
-    @Column(name = "status", nullable = false)
-    private String status;
-    // TODO enum
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "station_id")
-    private Station station;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "train_instance_id")
-    private TrainInstance trainInstance;
+    public PlanTarget forPlan(Plan newPlan, Station station) {
+        return PlanTarget.builder()
+                .uuid(UUID.randomUUID())
+                .plan(newPlan)
+                .station(station)
+                .createdAt(newPlan.getCreatedAt())
+                .updatedAt(newPlan.getUpdatedAt())
+                .build();
+    }
 }

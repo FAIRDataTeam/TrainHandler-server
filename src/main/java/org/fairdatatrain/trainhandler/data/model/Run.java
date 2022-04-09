@@ -20,30 +20,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.error;
+package org.fairdatatrain.trainhandler.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 
-import java.util.Collections;
-import java.util.Map;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity(name = "Run")
+@Table(name = "run")
 @Getter
 @Setter
-public class ErrorDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class Run extends BaseEntity {
 
-    private String code;
+    @NotBlank
+    @NotNull
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
 
-    private String message;
+    @NotNull
+    @Column(name = "note", nullable = false)
+    private String note;
 
-    private Map<String, String> fields = Collections.emptyMap();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "run_status", nullable = false)
+    private RunStatus status;
 
-    public ErrorDTO(String code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+    @Column(name = "should_start_at")
+    private Timestamp shouldStartAt;
+
+    @Column(name = "started_at")
+    private Timestamp startedAt;
+
+    @Column(name = "finished_at")
+    private Timestamp finishedAt;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "run")
+    private List<Job> jobs;
 }

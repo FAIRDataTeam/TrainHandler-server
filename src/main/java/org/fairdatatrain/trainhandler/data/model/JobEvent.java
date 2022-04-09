@@ -22,53 +22,54 @@
  */
 package org.fairdatatrain.trainhandler.data.model;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
-import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
+import org.fairdatatrain.trainhandler.data.model.enums.JobEventType;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.List;
 
-@Entity(name = "TrainGarage")
-@Table(name = "train_garage")
+@Entity(name = "JobEvent")
+@Table(name = "job_event")
+@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class TrainGarage extends BaseEntity {
-
-    @NotBlank
-    @NotNull
-    @Column(name = "uri", nullable = false)
-    private String uri;
-
-    @NotBlank
-    @NotNull
-    @Column(name = "display_name", nullable = false)
-    private String displayName;
-
-    @NotNull
-    @Column(name = "note", nullable = false)
-    private String note;
-
-    @Column(name = "metadata")
-    private String metadata;
+public class JobEvent extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "sync_service_status", nullable = false)
-    private SyncServiceStatus status;
+    @Column(name = "type", columnDefinition = "job_event_type", nullable = false)
+    private JobEventType type;
 
-    @Column(name = "last_contact_at")
-    private Timestamp lastContactAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "result_status", columnDefinition = "job_status")
+    private JobStatus resultStatus;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "garage")
-    private List<Train> trains;
+    @NotNull
+    @Column(name = "occurred_at")
+    private Timestamp occurredAt;
+
+    @NotNull
+    @Column(name = "message", nullable = false)
+    private String message;
+
+    @Column(name = "payload", columnDefinition = "json")
+    @Type(type = "json")
+    private String payload;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "job_id")
+    private Job job;
 }

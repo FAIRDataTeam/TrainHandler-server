@@ -20,12 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.utils;
 
-import org.fairdatatrain.trainhandler.data.model.TrainRun;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Collection;
+import java.util.List;
 
-@Repository
-public interface TrainRunRepository extends BaseRepository<TrainRun> {
+public class CompareUtils {
+
+    public static <T> boolean compareListContents(List<T> listA, Collection<T> listB) {
+        if (listA.size() != listB.size()) {
+            return false;
+        }
+        return listA.retainAll(listB);
+    }
 }

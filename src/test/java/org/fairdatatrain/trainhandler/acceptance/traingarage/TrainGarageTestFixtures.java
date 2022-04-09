@@ -24,6 +24,7 @@ package org.fairdatatrain.trainhandler.acceptance.traingarage;
 
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.data.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -42,7 +43,7 @@ public class TrainGarageTestFixtures {
                     .displayName("Train Garage A")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 
@@ -55,7 +56,7 @@ public class TrainGarageTestFixtures {
                     .displayName("Train Garage B")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 
@@ -68,7 +69,7 @@ public class TrainGarageTestFixtures {
                     .displayName("Train Garage C")
                     .note("")
                     .metadata("")
-                    .status("UNKNOWN")
+                    .status(SyncServiceStatus.SYNCED)
                     .lastContactAt(Timestamp.from(Instant.now()))
                     .build();
 

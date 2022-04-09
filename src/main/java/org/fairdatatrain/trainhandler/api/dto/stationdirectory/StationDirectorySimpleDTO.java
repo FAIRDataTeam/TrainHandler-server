@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.api.dto.stationdirectory;
 
 import lombok.*;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
 import java.util.UUID;
 
@@ -38,4 +39,6 @@ public class StationDirectorySimpleDTO {
     private String uri;
 
     private String displayName;
+
+    private SyncServiceStatus status;
 }

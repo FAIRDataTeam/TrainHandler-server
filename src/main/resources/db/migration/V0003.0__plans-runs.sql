@@ -21,30 +21,32 @@
 -- THE SOFTWARE.
 --
 
-CREATE TABLE IF NOT EXISTS station_directory
+CREATE TABLE IF NOT EXISTS plan
 (
-    uuid         UUID         NOT NULL
-        CONSTRAINT station_directory_pk PRIMARY KEY,
-    uri          TEXT         NOT NULL,
-    display_name VARCHAR(255) NOT NULL,
-    note         TEXT         NOT NULL,
-    metadata     TEXT,
-    status       VARCHAR(50),
-    last_contact TIMESTAMP,
-    created_at   TIMESTAMP    NOT NULL,
-    updated_at   TIMESTAMP    NOT NULL
+    uuid         UUID      NOT NULL
+        CONSTRAINT train_instance_pk PRIMARY KEY,
+    display_name TEXT      NOT NULL,
+    note         TEXT      NOT NULL,
+    train_id     UUID      NOT NULL,
+    created_at   TIMESTAMP NOT NULL,
+    updated_at   TIMESTAMP NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS train_garage
+ALTER TABLE plan
+    ADD CONSTRAINT plan_train_fk FOREIGN KEY (train_id) REFERENCES train (uuid);
+
+CREATE TABLE IF NOT EXISTS plan_target
 (
-    uuid         UUID         NOT NULL
-        CONSTRAINT train_garage_pk PRIMARY KEY,
-    uri          TEXT         NOT NULL,
-    display_name VARCHAR(255) NOT NULL,
-    note         TEXT         NOT NULL,
-    metadata     TEXT,
-    status       VARCHAR(50),
-    last_contact TIMESTAMP,
-    created_at   TIMESTAMP    NOT NULL,
-    updated_at   TIMESTAMP    NOT NULL
+    uuid       UUID      NOT NULL
+        CONSTRAINT plan_target_pk PRIMARY KEY,
+    station_id UUID      NOT NULL,
+    plan_id    UUID      NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
+
+ALTER TABLE plan_target
+    ADD CONSTRAINT plan_target_station_fk FOREIGN KEY (station_id) REFERENCES station (uuid);
+
+ALTER TABLE plan_target
+    ADD CONSTRAINT plan_target_plan_fk FOREIGN KEY (plan_id) REFERENCES plan (uuid);

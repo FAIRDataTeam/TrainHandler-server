@@ -20,19 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.traininstance;
+package org.fairdatatrain.trainhandler.utils;
 
-import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class TrainRunSimpleDTO {
-
-    private StationSimpleDTO station;
-
-    private String status;
+public class RandomUtils {
+    public static String randomSecret() {
+        return UUID.randomUUID().toString();
+    }
 }

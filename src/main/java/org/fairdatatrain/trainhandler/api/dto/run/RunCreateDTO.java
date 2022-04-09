@@ -20,45 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.train;
+package org.fairdatatrain.trainhandler.api.dto.run;
 
-import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-public class TrainDTO {
+public class RunCreateDTO {
 
-    private UUID uuid;
+    @NotBlank
+    private String displayName;
 
-    private String uri;
+    @NotNull
+    private String note;
 
-    private String title;
+    @NotNull
+    private UUID planUuid;
 
-    private String description;
-
-    private List<String> keywords;
-
-    private SyncItemStatus status;
-
-    private String metadata;
-
-    private TrainGarageSimpleDTO garage;
-
-    private List<TrainTypeSimpleDTO> types;
-
-    private Instant lastContactAt;
-
-    private Instant createdAt;
-
-    private Instant updatedAt;
+    private Instant shouldStartAt;
 }

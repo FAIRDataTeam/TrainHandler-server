@@ -20,33 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.traininstance;
+package org.fairdatatrain.trainhandler.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity(name = "Plan")
+@Table(name = "plan")
 @Getter
 @Setter
-public class TrainInstanceCreateDTO {
-
-    @NotNull
-    private UUID trainUuid;
-
-    @NotNull
-    private List<UUID> stationUuids;
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class Plan extends BaseEntity {
 
     @NotBlank
+    @NotNull
+    @Column(name = "display_name", nullable = false)
     private String displayName;
 
     @NotNull
+    @Column(name = "note", nullable = false)
     private String note;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "train_id")
+    private Train train;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "plan")
+    private List<PlanTarget> targets;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "plan")
+    private List<Run> runs;
 }

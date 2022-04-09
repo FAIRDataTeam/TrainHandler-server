@@ -20,16 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.api.dto.run;
 
-import org.fairdatatrain.trainhandler.data.model.TrainInstance;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import lombok.*;
+import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 
-@Repository
-public interface TrainInstanceRepository extends BaseRepository<TrainInstance> {
+import java.time.Instant;
+import java.util.UUID;
 
-    Page<TrainInstance> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class RunSimpleDTO {
+
+    private UUID uuid;
+
+    private String displayName;
+
+    private String note;
+
+    private RunStatus status;
+
+    private UUID trainUuid;
+
+    private UUID planUuid;
+
+    private Instant shouldStartAt;
+
+    private Instant startedAt;
+
+    private Instant finishedAt;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }

@@ -20,45 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.train;
+package org.fairdatatrain.trainhandler.data.repository;
 
-import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
+import org.fairdatatrain.trainhandler.data.model.Plan;
+import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+@Repository
+public interface PlanRepository extends BaseRepository<Plan> {
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class TrainDTO {
-
-    private UUID uuid;
-
-    private String uri;
-
-    private String title;
-
-    private String description;
-
-    private List<String> keywords;
-
-    private SyncItemStatus status;
-
-    private String metadata;
-
-    private TrainGarageSimpleDTO garage;
-
-    private List<TrainTypeSimpleDTO> types;
-
-    private Instant lastContactAt;
-
-    private Instant createdAt;
-
-    private Instant updatedAt;
+    Page<Plan> findByDisplayNameContainingIgnoreCase(String query, Pageable pageable);
 }
