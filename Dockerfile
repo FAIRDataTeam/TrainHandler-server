@@ -34,6 +34,7 @@ RUN mvn --quiet -B -U --fail-fast -DskipTests package
 FROM eclipse-temurin:17-alpine
 
 WORKDIR /app
+EXPOSE 8080
 
 # Mount point for rolling log files
 RUN mkdir /app/logs
