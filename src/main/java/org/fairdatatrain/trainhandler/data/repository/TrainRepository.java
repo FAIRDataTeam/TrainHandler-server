@@ -26,6 +26,8 @@ import org.fairdatatrain.trainhandler.data.model.Train;
 import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,5 +37,10 @@ public interface TrainRepository extends BaseRepository<Train> {
 
     Page<Train> findByTitleContainingIgnoreCase(String query, Pageable pageable);
 
-    List<Train> findByTitleContainingIgnoreCase(String query);
+    @Query("""
+        SELECT t
+        FROM Train t
+        WHERE LOWER(t.title) LIKE %:query%
+        ORDER BY t.title""")
+    List<Train> findByTitleContainingIgnoreCase(@Param("query") String query);
 }
