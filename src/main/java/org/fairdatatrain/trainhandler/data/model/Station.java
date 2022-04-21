@@ -78,10 +78,10 @@ public class Station extends BaseEntity {
     @JoinColumn(name = "station_directory_id")
     private StationDirectory directory;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "station_train_type",
-            joinColumns = @JoinColumn(name = "train_type_id"),
-            inverseJoinColumns = @JoinColumn(name = "station_id"))
+            joinColumns = @JoinColumn(name = "station_id"),
+            inverseJoinColumns = @JoinColumn(name = "train_type_id"))
     private List<TrainType> types;
 }

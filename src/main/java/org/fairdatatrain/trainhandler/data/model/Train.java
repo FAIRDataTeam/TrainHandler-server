@@ -78,10 +78,10 @@ public class Train extends BaseEntity {
     @Column(name = "last_contact_at")
     private Timestamp lastContactAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "train_train_type",
-            joinColumns = @JoinColumn(name = "train_type_id"),
-            inverseJoinColumns = @JoinColumn(name = "train_id"))
+            joinColumns = @JoinColumn(name = "train_id"),
+            inverseJoinColumns = @JoinColumn(name = "train_type_id"))
     private List<TrainType> types;
 }
