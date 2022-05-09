@@ -20,20 +20,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.service.async;
 
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.JobEvent;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.context.ApplicationEvent;
 
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.UUID;
 
-@Repository
-public interface JobEventRepository extends BaseRepository<JobEvent> {
+public class JobEventNotification extends ApplicationEvent {
 
-    List<JobEvent> findAllByJobOrderByOccurredAtAsc(Job job);
+    private final UUID jobUuid;
 
-    List<JobEvent> findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(Job job, Timestamp threshold);
+    JobEventNotification(Object source, UUID jobUuid) {
+        super(source);
+        this.jobUuid = jobUuid;
+    }
+
+    public UUID getJobUuid() {
+        return jobUuid;
+    }
 }

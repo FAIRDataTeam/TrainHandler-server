@@ -20,20 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.service.async;
 
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.JobEvent;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-@Repository
-public interface JobEventRepository extends BaseRepository<JobEvent> {
+@Component
+public class JobEventNotificationListener {
 
-    List<JobEvent> findAllByJobOrderByOccurredAtAsc(Job job);
+    private final Map<UUID, Object> locks = new HashMap<>();
 
-    List<JobEvent> findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(Job job, Timestamp threshold);
+    @EventListener
+    public void handleJobEventNotification(JobEventNotification notification) {
+        if (locks.containsKey(notification.getJobUuid())) {
+            synchronized (locks.get(notification.getJobUuid())) {
+                final Object lock = locks.remove(notification.getJobUuid());
+                lock.notifyAll();
+            }
+        }
+    }
+
+    private void prepare(UUID jobUuid) {
+        if (!locks.containsKey(jobUuid)) {
+            locks.put(jobUuid, new Object());
+        }
+    }
+
+    public void wait(UUID jobUuid) throws InterruptedException {
+        prepare(jobUuid);
+        synchronized (locks.get(jobUuid)) {
+            locks.get(jobUuid).wait();
+        }
+    }
 }

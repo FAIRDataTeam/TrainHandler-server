@@ -20,20 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.exception;
 
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.JobEvent;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.sql.Timestamp;
-import java.util.List;
+@AllArgsConstructor
+@Getter
+public class JobSecurityException extends Exception {
 
-@Repository
-public interface JobEventRepository extends BaseRepository<JobEvent> {
-
-    List<JobEvent> findAllByJobOrderByOccurredAtAsc(Job job);
-
-    List<JobEvent> findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(Job job, Timestamp threshold);
+    private final String message;
 }

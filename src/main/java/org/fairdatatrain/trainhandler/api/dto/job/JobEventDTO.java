@@ -38,7 +38,7 @@ public class JobEventDTO {
 
     private UUID uuid;
 
-    private JobEventType typ;
+    private JobEventType type;
 
     private JobStatus resultStatus;
 

@@ -20,20 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.service.async;
 
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.JobEvent;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.UUID;
 
-@Repository
-public interface JobEventRepository extends BaseRepository<JobEvent> {
+import static java.lang.String.format;
 
-    List<JobEvent> findAllByJobOrderByOccurredAtAsc(Job job);
+@Component
+@AllArgsConstructor
+@Slf4j
+public class AsyncEventPublisher {
 
-    List<JobEvent> findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(Job job, Timestamp threshold);
+    private final ApplicationEventPublisher publisher;
+
+    public void publishNewJobEventNotification(final UUID jobUuid) {
+        log.info(format("Publishing new job event notification for job %s", jobUuid));
+        publisher.publishEvent(new JobEventNotification(this, jobUuid));
+    }
+
 }

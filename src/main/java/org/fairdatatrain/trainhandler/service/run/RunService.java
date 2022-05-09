@@ -91,6 +91,7 @@ public class RunService {
         jobRepository.saveAll(jobs);
         entityManager.flush();
         entityManager.refresh(newRun);
+        // TODO: schedule the run / dispatch it in async
         return runMapper.toDTO(newRun);
     }
 

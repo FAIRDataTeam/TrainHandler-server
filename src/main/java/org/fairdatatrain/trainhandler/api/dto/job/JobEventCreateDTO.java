@@ -20,20 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.api.dto.job;
 
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.JobEvent;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.fairdatatrain.trainhandler.data.model.enums.JobEventType;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
-import java.sql.Timestamp;
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
-@Repository
-public interface JobEventRepository extends BaseRepository<JobEvent> {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class JobEventCreateDTO {
 
-    List<JobEvent> findAllByJobOrderByOccurredAtAsc(Job job);
+    @NotNull
+    private JobEventType type;
 
-    List<JobEvent> findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(Job job, Timestamp threshold);
+    private JobStatus resultStatus;
+
+    @NotNull
+    private String message;
+
+    private String payload;
+
+    @NotNull
+    private Instant occurredAt;
+
+    @NotNull
+    private String remoteId;
+
+    @NotNull
+    private String secret;
 }

@@ -38,7 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JobService {
 
-    private static final String ENTITY_NAME = "Job";
+    public static final String ENTITY_NAME = "Job";
 
     private final JobRepository jobRepository;
 
@@ -51,12 +51,17 @@ public class JobService {
     }
 
     public Page<JobSimpleDTO> getJobsForRun(UUID runUuid, Pageable pageable) {
-        return jobRepository.findAllByRunUuid(runUuid, pageable).map(jobMapper::toSimpleDTO);
+        return jobRepository
+                .findAllByRunUuid(runUuid, pageable)
+                .map(jobMapper::toSimpleDTO);
     }
 
     public JobDTO getSingle(UUID runUuid, UUID jobUuid) throws NotFoundException {
-        // TODO: check runUuid?
         final Job job = getByIdOrThrow(jobUuid);
+        /*
+        if (job.getRun().getUuid() != runUuid) {
+            throw new NotFoundException(ENTITY_NAME, jobUuid);
+        }*/
         return jobMapper.toDTO(job);
     }
 }
