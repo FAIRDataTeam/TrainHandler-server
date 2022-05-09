@@ -35,7 +35,7 @@
 
         <!-- dependencies -->
         <springdoc.version>1.6.8</springdoc.version>
-        <postgresql.version>42.3.4</postgresql.version>
+        <postgresql.version>42.3.5</postgresql.version>
         <lombok.version>1.18.24</lombok.version>
         <hibernate-types.version>2.14.1</hibernate-types.version>
 
