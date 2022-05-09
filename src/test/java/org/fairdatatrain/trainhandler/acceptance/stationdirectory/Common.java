@@ -24,7 +24,7 @@ package org.fairdatatrain.trainhandler.acceptance.stationdirectory;
 
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

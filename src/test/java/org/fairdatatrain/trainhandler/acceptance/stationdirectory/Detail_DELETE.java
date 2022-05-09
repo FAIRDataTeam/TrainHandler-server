@@ -23,9 +23,8 @@
 package org.fairdatatrain.trainhandler.acceptance.stationdirectory;
 
 import org.fairdatatrain.trainhandler.acceptance.WebIntegrationTest;
-import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
-import org.fairdatatrain.trainhandler.repository.StationDirectoryRepository;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.repository.StationDirectoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,8 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 @DisplayName("DELETE /station-directories/:uuid")
 public class Detail_DELETE extends WebIntegrationTest {

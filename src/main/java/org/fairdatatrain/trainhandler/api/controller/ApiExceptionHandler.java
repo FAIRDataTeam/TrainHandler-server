@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.api.controller;
 
 import org.fairdatatrain.trainhandler.api.dto.error.ErrorDTO;
+import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.exception.NotImplementedException;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,18 @@ public class ApiExceptionHandler {
                                 "Cannot find entity %s with %s",
                                 exception.getEntityName(), exception.getFields())),
                 HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CannotPerformException.class)
+    public ResponseEntity<ErrorDTO> handleCannotDeleteException(CannotPerformException exception) {
+        return new ResponseEntity<>(
+                new ErrorDTO(
+                        "HTTP-400",
+                        format(
+                                "Cannot perform %s on entity %s (with %s)",
+                                exception.getOperation(),
+                                exception.getEntityName(),
+                                exception.getFields())),
+                HttpStatus.BAD_REQUEST);
     }
 }

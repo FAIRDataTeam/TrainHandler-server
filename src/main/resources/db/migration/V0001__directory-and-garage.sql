@@ -24,7 +24,7 @@
 CREATE TABLE IF NOT EXISTS station_directory
 (
     uuid         UUID         NOT NULL
-        CONSTRAINT station_directory_pkey PRIMARY KEY,
+        CONSTRAINT station_directory_pk PRIMARY KEY,
     uri          TEXT         NOT NULL,
     display_name VARCHAR(255) NOT NULL,
     note         TEXT         NOT NULL,
@@ -38,11 +38,11 @@ CREATE TABLE IF NOT EXISTS station_directory
 CREATE TABLE IF NOT EXISTS train_garage
 (
     uuid         UUID         NOT NULL
-        CONSTRAINT train_garage_pkey PRIMARY KEY,
+        CONSTRAINT train_garage_pk PRIMARY KEY,
     uri          TEXT         NOT NULL,
     display_name VARCHAR(255) NOT NULL,
     note         TEXT         NOT NULL,
-    metadata     TEXT ,
+    metadata     TEXT,
     status       VARCHAR(50),
     last_contact TIMESTAMP,
     created_at   TIMESTAMP    NOT NULL,

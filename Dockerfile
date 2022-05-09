@@ -36,10 +36,12 @@ FROM eclipse-temurin:17-alpine
 WORKDIR /app
 EXPOSE 8080
 
+ENV SPRING_PROFILE=production
+
 # Mount point for rolling log files
 RUN mkdir /app/logs
 
 COPY --from=builder /builder/target/app.jar /app/app.jar
 COPY --from=builder /builder/target/classes/application.yml /app/application.yml
 
-ENTRYPOINT java -jar app.jar --spring.profiles.active=production --spring.config.location=classpath:/application.yml,file:/app/application.yml
+ENTRYPOINT java -jar app.jar --spring.profiles.active=$SPRING_PROFILE --spring.config.location=classpath:/application.yml,file:/app/application.yml

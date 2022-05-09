@@ -22,6 +22,7 @@
  */
 package org.fairdatatrain.trainhandler.api.dto.traingarage;
 import lombok.*;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -43,9 +44,12 @@ public class TrainGarageDTO {
 
     private String metadata;
 
-    private String status;
+    private SyncServiceStatus status;
 
-    private Instant lastContact;
+    private Instant lastContactAt;
 
+    private Instant createdAt;
+
+    private Instant updatedAt;
 }
 

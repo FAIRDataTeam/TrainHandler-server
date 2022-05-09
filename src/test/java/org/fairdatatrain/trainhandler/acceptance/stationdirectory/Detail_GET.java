@@ -23,10 +23,9 @@
 package org.fairdatatrain.trainhandler.acceptance.stationdirectory;
 
 import org.fairdatatrain.trainhandler.acceptance.WebIntegrationTest;
-import org.fairdatatrain.trainhandler.acceptance.helper.HelperPage;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
-import org.fairdatatrain.trainhandler.model.StationDirectory;
-import org.fairdatatrain.trainhandler.repository.StationDirectoryRepository;
+import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.repository.StationDirectoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.StreamSupport;
 
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;

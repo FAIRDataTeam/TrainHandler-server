@@ -27,6 +27,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collections;
+import java.util.Map;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -37,4 +40,10 @@ public class ErrorDTO {
 
     private String message;
 
+    private Map<String, String> fields = Collections.emptyMap();
+
+    public ErrorDTO(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 }

@@ -24,8 +24,8 @@ package org.fairdatatrain.trainhandler.acceptance.traingarage;
 
 import org.fairdatatrain.trainhandler.acceptance.WebIntegrationTest;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
-import org.fairdatatrain.trainhandler.model.TrainGarage;
-import org.fairdatatrain.trainhandler.repository.TrainGarageRepository;
+import org.fairdatatrain.trainhandler.data.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.repository.TrainGarageRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

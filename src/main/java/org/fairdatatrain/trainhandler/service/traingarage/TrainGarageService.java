@@ -23,20 +23,15 @@
 package org.fairdatatrain.trainhandler.service.traingarage;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
-import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainInfoDTO;
+import org.fairdatatrain.trainhandler.data.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.repository.TrainGarageRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.model.TrainGarage;
-import org.fairdatatrain.trainhandler.repository.TrainGarageRepository;
-import org.fairdatatrain.trainhandler.service.fixtures.TrainGarageFixtures;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -89,19 +84,5 @@ public class TrainGarageService {
                 trainGarageRepository.save(
                         trainGarageMapper.fromUpdateDTO(reqDto, trainGarage));
         return this.trainGarageMapper.toDTO(updatedTrainGarage);
-    }
-
-    @SneakyThrows
-    public List<TrainInfoDTO> search(String query) {
-        // Dummy
-        final String finalQuery = query.toLowerCase(Locale.ROOT);
-        return TrainGarageFixtures.TRAINS.stream()
-                .filter(
-                        garage -> {
-                            return garage.getDisplayName()
-                                    .toLowerCase(Locale.ROOT)
-                                    .contains(finalQuery);
-                        })
-                .toList();
     }
 }
