@@ -20,58 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.model;
+package org.fairdatatrain.trainhandler.service.dispatch;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
-import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
+import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.UUID;
 
-@Entity(name = "Run")
-@Table(name = "run")
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-public class Run extends BaseEntity {
-
-    @NotBlank
-    @NotNull
-    @Column(name = "display_name", nullable = false)
-    private String displayName;
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class DispatchPayload {
 
     @NotNull
-    @Column(name = "note", nullable = false)
-    private String note;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "run_status", nullable = false)
-    private RunStatus status;
-
-    @Column(name = "should_start_at")
-    private Timestamp shouldStartAt;
-
-    @Column(name = "started_at")
-    private Timestamp startedAt;
-
-    @Column(name = "finished_at")
-    private Timestamp finishedAt;
+    private UUID jobUuid;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "plan_id")
-    private Plan plan;
+    private String secret;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "run")
-    private List<Job> jobs;
+    @NotNull
+    private String callbackLocation;
+
+    @NotNull
+    private String trainUri;
 }

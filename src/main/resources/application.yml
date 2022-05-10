@@ -11,6 +11,11 @@ spring:
         ddl-auto: validate
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+dispatch:
+  initDelay: PT1M
+  interval: PT1M
+  root: http://localhost:8080
+
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true

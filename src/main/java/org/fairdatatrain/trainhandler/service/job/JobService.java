@@ -58,10 +58,9 @@ public class JobService {
 
     public JobDTO getSingle(UUID runUuid, UUID jobUuid) throws NotFoundException {
         final Job job = getByIdOrThrow(jobUuid);
-        /*
-        if (job.getRun().getUuid() != runUuid) {
+        if (!job.getRun().getUuid().equals(runUuid)) {
             throw new NotFoundException(ENTITY_NAME, jobUuid);
-        }*/
+        }
         return jobMapper.toDTO(job);
     }
 }

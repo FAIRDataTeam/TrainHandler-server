@@ -47,9 +47,16 @@ public class JobMapper {
 
     private final RunMapper runMapper;
 
-    public JobMapper(StationMapper stationMapper, @Lazy RunMapper runMapper) {
+    private final JobEventMapper jobEventMapper;
+
+    public JobMapper(
+            StationMapper stationMapper,
+            JobEventMapper jobEventMapper,
+            @Lazy RunMapper runMapper
+    ) {
         this.stationMapper = stationMapper;
         this.runMapper = runMapper;
+        this.jobEventMapper = jobEventMapper;
     }
 
     public JobSimpleDTO toSimpleDTO(Job job) {
@@ -85,6 +92,7 @@ public class JobMapper {
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .run(runMapper.toSimpleDTO(job.getRun()))
+                .events(job.getEvents().stream().map(jobEventMapper::toDTO).toList())
                 .createdAt(job.getCreatedAt().toInstant())
                 .updatedAt(job.getUpdatedAt().toInstant())
                 .build();

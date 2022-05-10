@@ -20,32 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.service.dispatch;
 
-import org.fairdatatrain.trainhandler.data.model.Run;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.fairdatatrain.trainhandler.api.controller.JobController;
+import org.fairdatatrain.trainhandler.data.model.Job;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
-import java.util.Optional;
-import java.util.UUID;
+@Component
+public class DispatchMapper {
 
-@Repository
-public interface RunRepository extends BaseRepository<Run> {
+    @Value("${dispatch.root}")
+    private String dispatchRoot;
 
-    Page<Run> findAllByPlanUuid(UUID planUuid, Pageable pageable);
-
-    @Query("""
-        SELECT r
-        FROM Run r
-        WHERE r.status = 'SCHEDULED'
-            AND r.shouldStartAt IS NOT NULL
-            AND r.shouldStartAt < :timestamp
-        ORDER BY r.shouldStartAt ASC
-        """)
-    Optional<Run> findRunToDispatch(@Param("timestamp") Timestamp timestamp);
+    public DispatchPayload toPayload(Job job) {
+        final String callbackLocation = JobController.EVENT_CALLBACK_LOCATION
+                .replace("{runUuid}", job.getRun().getUuid().toString())
+                .replace("{jobUuid}", job.getUuid().toString());
+        return DispatchPayload
+                .builder()
+                .jobUuid(job.getUuid())
+                .secret(job.getSecret())
+                .trainUri(job.getRun().getPlan().getTrain().getUri())
+                .callbackLocation(dispatchRoot + "/runs" + callbackLocation)
+                .build();
+    }
 }

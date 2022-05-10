@@ -104,7 +104,9 @@ public class RunMapper {
                 .uuid(UUID.randomUUID())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
-                .status(RunStatus.PREPARED)
+                .status(reqDto.getShouldStartAt() == null
+                        ? RunStatus.PREPARED
+                        : RunStatus.SCHEDULED)
                 .plan(plan)
                 .shouldStartAt(
                         Optional.ofNullable(reqDto.getShouldStartAt())

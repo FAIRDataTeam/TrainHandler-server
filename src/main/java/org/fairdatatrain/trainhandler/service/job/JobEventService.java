@@ -73,10 +73,9 @@ public class JobEventService {
 
     public List<JobEventDTO> getEvents(UUID runUuid, UUID jobUuid) throws NotFoundException {
         final Job job = jobService.getByIdOrThrow(jobUuid);
-        /*
-        if (job.getRun().getUuid() != runUuid) {
+        if (!job.getRun().getUuid().equals(runUuid)) {
             throw new NotFoundException(JobService.ENTITY_NAME, jobUuid);
-        }*/
+        }
         return jobEventRepository
                 .findAllByJobOrderByOccurredAtAsc(job)
                 .parallelStream()
@@ -121,6 +120,9 @@ public class JobEventService {
             UUID runUuid, UUID jobUuid, JobEventCreateDTO reqDto
     ) throws NotFoundException, JobSecurityException {
         final Job job = jobService.getByIdOrThrow(jobUuid);
+        if (!job.getRun().getUuid().equals(runUuid)) {
+            throw new NotFoundException(JobService.ENTITY_NAME, jobUuid);
+        }
         if (!Objects.equals(job.getSecret(), reqDto.getSecret())) {
             throw new JobSecurityException("Incorrect secret for creating job event");
         }
@@ -130,6 +132,10 @@ public class JobEventService {
         }
         else if (!Objects.equals(job.getRemoteId(), reqDto.getRemoteId())) {
             throw new JobSecurityException("Incorrect remote ID for creating job event");
+        }
+        if (reqDto.getResultStatus() != null) {
+            job.setStatus(reqDto.getResultStatus());
+            jobRepository.save(job);
         }
         final JobEvent jobEvent = jobEventRepository.save(
                 jobEventMapper.fromCreateDTO(reqDto, job)

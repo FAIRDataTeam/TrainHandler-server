@@ -61,6 +61,8 @@ public class RunService {
 
     private final JobRepository jobRepository;
 
+    private final RunDispatcher runDispatcher;
+
     @PersistenceContext
     private final EntityManager entityManager;
 
@@ -91,7 +93,7 @@ public class RunService {
         jobRepository.saveAll(jobs);
         entityManager.flush();
         entityManager.refresh(newRun);
-        // TODO: schedule the run / dispatch it in async
+        runDispatcher.dispatchNewRun(newRun);
         return runMapper.toDTO(newRun);
     }
 

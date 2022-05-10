@@ -34,4 +34,5 @@ import java.util.UUID;
 public interface JobRepository extends BaseRepository<Job> {
 
     Page<Job> findAllByRunUuid(UUID runUuid, Pageable pageable);
+
 }

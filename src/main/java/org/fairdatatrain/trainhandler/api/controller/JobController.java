@@ -49,6 +49,9 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/runs")
 @RequiredArgsConstructor
 public class JobController {
+
+    public static final String EVENT_CALLBACK_LOCATION = "/{runUuid}/jobs/{jobUuid}/events";
+
     private final JobService jobService;
 
     private final JobEventService jobEventService;
@@ -62,7 +65,7 @@ public class JobController {
             path = "/{runUuid}/jobs/{jobUuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public JobDTO getJobs(
+    public JobDTO getJob(
             @PathVariable UUID runUuid, @PathVariable UUID jobUuid
     ) throws NotFoundException {
         return jobService.getSingle(runUuid, jobUuid);
@@ -105,7 +108,7 @@ public class JobController {
     }
 
     @PostMapping(
-            path = "/{runUuid}/jobs/{jobUuid}/events",
+            path = EVENT_CALLBACK_LOCATION,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
