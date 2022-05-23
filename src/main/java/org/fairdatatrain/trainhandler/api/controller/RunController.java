@@ -33,9 +33,11 @@ import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Runs")
 @RestController
@@ -54,10 +56,30 @@ public class RunController {
         return runService.create(reqDto);
     }
 
-    @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public RunDTO getSingle(@PathVariable UUID uuid) throws NotFoundException {
-        // TODO: polling
-        return runService.getSingle(uuid);
+    @GetMapping(
+            path = "/{uuid}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public DeferredResult<RunDTO> pollRun(
+            @PathVariable UUID uuid,
+            @RequestParam(required = false, defaultValue = "0") Long after
+    ) throws NotFoundException {
+        // TODO: configurable timeout
+        final RunDTO currentRun = runService.getSingle(uuid);
+        final DeferredResult<RunDTO> run = new DeferredResult<>(
+                10 * 1000L, currentRun
+        );
+        CompletableFuture.runAsync(() -> {
+            try {
+                run.setResult(runService.poll(uuid, after, currentRun));
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                run.setResult(null);
+                // TODO: better error handling
+            }
+        });
+        return run;
     }
 
     @PutMapping(

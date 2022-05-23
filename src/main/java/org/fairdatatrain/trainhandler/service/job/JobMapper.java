@@ -24,9 +24,7 @@ package org.fairdatatrain.trainhandler.service.job;
 
 import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.PlanTarget;
-import org.fairdatatrain.trainhandler.data.model.Run;
+import org.fairdatatrain.trainhandler.data.model.*;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 import org.fairdatatrain.trainhandler.service.job.artifact.JobArtifactMapper;
 import org.fairdatatrain.trainhandler.service.job.event.JobEventMapper;
@@ -36,8 +34,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.fairdatatrain.trainhandler.utils.RandomUtils.randomSecret;
 import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
@@ -65,6 +65,19 @@ public class JobMapper {
         this.jobArtifactMapper = jobArtifactMapper;
     }
 
+    private Long getJobVersion(Job job) {
+        return 1L + Stream.concat(
+                job.getArtifacts().stream()
+                        .map(JobArtifact::getOccurredAt)
+                        .map(Timestamp::toInstant)
+                        .map(Instant::toEpochMilli),
+                job.getEvents().stream()
+                        .map(JobEvent::getOccurredAt)
+                        .map(Timestamp::toInstant)
+                        .map(Instant::toEpochMilli)
+        ).max(Long::compare).orElse(-1L);
+    }
+
     public JobSimpleDTO toSimpleDTO(Job job) {
         return JobSimpleDTO.builder()
                 .uuid(job.getUuid())
@@ -81,6 +94,7 @@ public class JobMapper {
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .runUuid(job.getRun().getUuid())
+                .version(getJobVersion(job))
                 .build();
     }
 
@@ -103,6 +117,7 @@ public class JobMapper {
                 .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .createdAt(job.getCreatedAt().toInstant())
                 .updatedAt(job.getUpdatedAt().toInstant())
+                .version(getJobVersion(job))
                 .build();
     }
 

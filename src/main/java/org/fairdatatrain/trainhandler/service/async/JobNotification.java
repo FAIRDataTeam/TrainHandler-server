@@ -30,12 +30,19 @@ public class JobNotification extends ApplicationEvent {
 
     private final UUID jobUuid;
 
-    JobNotification(Object source, UUID jobUuid) {
+    private final UUID runUuid;
+
+    JobNotification(Object source, UUID jobUuid, UUID runUuid) {
         super(source);
         this.jobUuid = jobUuid;
+        this.runUuid = runUuid;
     }
 
     public UUID getJobUuid() {
         return jobUuid;
+    }
+
+    public UUID getRunUuid() {
+        return runUuid;
     }
 }

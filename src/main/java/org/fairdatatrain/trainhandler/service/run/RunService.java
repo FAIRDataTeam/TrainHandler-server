@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.service.run;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
@@ -33,6 +34,7 @@ import org.fairdatatrain.trainhandler.data.model.Run;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
+import org.fairdatatrain.trainhandler.service.async.RunNotificationListener;
 import org.fairdatatrain.trainhandler.service.job.JobMapper;
 import org.fairdatatrain.trainhandler.service.plan.PlanService;
 import org.springframework.data.domain.Page;
@@ -47,6 +49,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RunService {
 
     public static final String ENTITY_NAME = "Run";
@@ -62,6 +65,8 @@ public class RunService {
     private final JobRepository jobRepository;
 
     private final RunDispatcher runDispatcher;
+
+    private final RunNotificationListener runNotificationListener;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -103,5 +108,20 @@ public class RunService {
         final Run run = getByIdOrThrow(uuid);
         final Run updatedRun = runRepository.save(runMapper.fromUpdateDTO(reqDto, run));
         return runMapper.toDTO(updatedRun);
+    }
+
+    @Transactional
+    public RunDTO poll(
+            UUID runUuid, Long version, RunDTO currentRun
+    ) throws InterruptedException, NotFoundException {
+        if (version < currentRun.getVersion()) {
+            return currentRun;
+        }
+        log.info("No run update at this point");
+        log.info("Starting to wait");
+        runNotificationListener.wait(runUuid);
+        log.info("Finished to wait");
+        entityManager.flush();
+        return getSingle(runUuid);
     }
 }

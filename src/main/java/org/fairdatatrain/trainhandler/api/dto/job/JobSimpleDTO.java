@@ -52,4 +52,6 @@ public class JobSimpleDTO {
     private List<JobArtifactDTO> artifacts;
 
     private UUID runUuid;
+
+    private Long version;
 }

@@ -24,7 +24,6 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.fairdatatrain.trainhandler.api.dto.job.*;
 import org.fairdatatrain.trainhandler.data.model.JobArtifact;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
@@ -37,14 +36,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -75,39 +72,29 @@ public class JobController {
             path = "/{runUuid}/jobs/{jobUuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public JobDTO getJob(
-            @PathVariable UUID runUuid, @PathVariable UUID jobUuid
-    ) throws NotFoundException {
-        // TODO: polling
-        return jobService.getSingle(runUuid, jobUuid);
-    }
-/*
-    @GetMapping(
-            path = "/{runUuid}/jobs/{jobUuid}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public DeferredResult<ResponseEntity<JobDTO>> pollNewerJobEvents(
+    public DeferredResult<JobDTO> pollJob(
             @PathVariable UUID runUuid,
             @PathVariable UUID jobUuid,
-            @RequestParam(required = false, defaultValue = "0") Instant since
-    ) {
+            @RequestParam(required = false, defaultValue = "0") Long after
+    ) throws NotFoundException {
         // TODO: configurable timeout
-        final DeferredResult<ResponseEntity<JobDTO>> job = new DeferredResult<>(
-                10 * 1000L, ResponseEntity.status(HttpStatus.NOT_MODIFIED).build()
+        final JobDTO currentJob = jobService.getSingle(runUuid, jobUuid);
+        final DeferredResult<JobDTO> job = new DeferredResult<>(
+                10 * 1000L, currentJob
         );
         CompletableFuture.runAsync(() -> {
             try {
-                job.setResult(jobService.poll(runUuid, jobUuid, since));
+                job.setResult(jobService.poll(runUuid, jobUuid, after, currentJob));
             }
             catch (Exception ex) {
                 ex.printStackTrace();
-                job.setResult(ResponseEntity.status(HttpStatus.NOT_MODIFIED).build());
+                job.setResult(null);
                 // TODO: better error handling
             }
         });
         return job;
     }
-*/
+
     @GetMapping(
             path = "/{runUuid}/jobs/{jobUuid}/events",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -164,9 +151,9 @@ public class JobController {
             @PathVariable UUID jobUuid,
             @PathVariable UUID artifactUuid
     ) throws NotFoundException {
-        JobArtifact artifact = jobArtifactService.getArtifact(runUuid, jobUuid, artifactUuid);
-        byte[] data = jobArtifactService.getArtifactData(artifact);
-        ByteArrayResource resource = new ByteArrayResource(data);
+        final JobArtifact artifact = jobArtifactService.getArtifact(runUuid, jobUuid, artifactUuid);
+        final byte[] data = jobArtifactService.getArtifactData(artifact);
+        final ByteArrayResource resource = new ByteArrayResource(data);
         return ResponseEntity
                 .ok()
                 .contentLength(artifact.getBytesize())
@@ -189,7 +176,7 @@ public class JobController {
             @RequestBody @Valid JobEventCreateDTO reqDto
     ) throws NotFoundException, JobSecurityException {
         final JobEventDTO dto = jobEventService.createEvent(runUuid, jobUuid, reqDto);
-        jobEventService.notify(jobUuid);
+        jobEventService.notify(jobUuid, runUuid);
         return dto;
     }
 }

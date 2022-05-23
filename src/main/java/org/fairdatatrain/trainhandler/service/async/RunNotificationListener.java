@@ -20,25 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.job.artifact;
+package org.fairdatatrain.trainhandler.service.async;
 
-import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactDTO;
-import org.fairdatatrain.trainhandler.data.model.JobArtifact;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Component
-public class JobArtifactMapper {
-    public JobArtifactDTO toDTO(JobArtifact artifact) {
-        return JobArtifactDTO
-                .builder()
-                .uuid(artifact.getUuid())
-                .displayName(artifact.getDisplayName())
-                .filename(artifact.getFilename())
-                .bytesize(artifact.getBytesize())
-                .hash(artifact.getHash())
-                .occurredAt(artifact.getOccurredAt().toInstant())
-                .createdAt(artifact.getCreatedAt().toInstant())
-                .updatedAt(artifact.getUpdatedAt().toInstant())
-                .build();
+public class RunNotificationListener {
+
+    private final Map<UUID, Object> locks = new HashMap<>();
+
+    @EventListener
+    public void handleJobEventNotification(JobNotification notification) {
+        if (locks.containsKey(notification.getRunUuid())) {
+            synchronized (locks.get(notification.getRunUuid())) {
+                final Object lock = locks.remove(notification.getRunUuid());
+                lock.notifyAll();
+            }
+        }
+    }
+
+    private void prepare(UUID runUuid) {
+        if (!locks.containsKey(runUuid)) {
+            locks.put(runUuid, new Object());
+        }
+    }
+
+    public void wait(UUID runUuid) throws InterruptedException {
+        prepare(runUuid);
+        synchronized (locks.get(runUuid)) {
+            locks.get(runUuid).wait();
+        }
     }
 }

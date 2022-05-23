@@ -38,9 +38,14 @@ public class AsyncEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
-    public void publishNewJobEventNotification(final UUID jobUuid) {
-        log.info(format("Publishing new job event notification for job %s", jobUuid));
-        publisher.publishEvent(new JobNotification(this, jobUuid));
+    public void publishNewJobEventNotification(final UUID jobUuid, final UUID runUuid) {
+        log.info(
+                format(
+                        "Publishing new job event notification for job %s (run %s)",
+                        jobUuid, runUuid
+                )
+        );
+        publisher.publishEvent(new JobNotification(this, jobUuid, runUuid));
     }
 
 }

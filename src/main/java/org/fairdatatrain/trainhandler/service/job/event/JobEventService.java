@@ -146,7 +146,7 @@ public class JobEventService {
         return jobEventMapper.toDTO(jobEvent);
     }
 
-    public void notify(UUID jobUuid) {
-        asyncEventPublisher.publishNewJobEventNotification(jobUuid);
+    public void notify(UUID jobUuid, UUID runUuid) {
+        asyncEventPublisher.publishNewJobEventNotification(jobUuid, runUuid);
     }
 }

@@ -59,4 +59,6 @@ public class JobDTO {
     private Instant createdAt;
 
     private Instant updatedAt;
+
+    private Long version;
 }

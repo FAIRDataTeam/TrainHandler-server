@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.service.run;
 
 import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
@@ -35,6 +36,7 @@ import org.fairdatatrain.trainhandler.service.plan.PlanMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,13 +76,21 @@ public class RunMapper {
     }
 
     public RunDTO toDTO(Run run) {
+        final List<JobSimpleDTO> jobs = run.getJobs().stream()
+                .map(jobMapper::toSimpleDTO)
+                .toList();
+        final Long version = jobs.stream()
+                .map(JobSimpleDTO::getVersion)
+                .max(Long::compareTo)
+                .orElse(0L);
         return RunDTO.builder()
                 .uuid(run.getUuid())
                 .displayName(run.getDisplayName())
                 .note(run.getNote())
                 .status(run.getStatus())
                 .plan(planMapper.toSimpleDTO(run.getPlan()))
-                .jobs(run.getJobs().stream().map(jobMapper::toSimpleDTO).toList())
+                .jobs(jobs)
+                .version(version)
                 .shouldStartAt(
                         Optional.ofNullable(run.getShouldStartAt())
                                 .map(Timestamp::toInstant)
