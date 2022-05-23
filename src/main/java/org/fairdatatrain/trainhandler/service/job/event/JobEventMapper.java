@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.job;
+package org.fairdatatrain.trainhandler.service.job.event;
 
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
@@ -38,11 +38,10 @@ public class JobEventMapper {
         return JobEventDTO
                 .builder()
                 .uuid(jobEvent.getUuid())
-                .type(jobEvent.getType())
                 .message(jobEvent.getMessage())
-                .payload(jobEvent.getPayload())
                 .resultStatus(jobEvent.getResultStatus())
                 .createdAt(jobEvent.getCreatedAt().toInstant())
+                .updatedAt(jobEvent.getUpdatedAt().toInstant())
                 .occurredAt(jobEvent.getOccurredAt().toInstant())
                 .build();
     }
@@ -53,9 +52,7 @@ public class JobEventMapper {
                 .builder()
                 .uuid(UUID.randomUUID())
                 .message(reqDto.getMessage())
-                .payload(reqDto.getPayload())
                 .resultStatus(reqDto.getResultStatus())
-                .type(reqDto.getType())
                 .occurredAt(Timestamp.from(reqDto.getOccurredAt()))
                 .job(job)
                 .createdAt(now)

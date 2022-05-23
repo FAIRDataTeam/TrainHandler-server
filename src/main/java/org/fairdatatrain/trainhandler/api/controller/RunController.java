@@ -56,6 +56,7 @@ public class RunController {
 
     @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public RunDTO getSingle(@PathVariable UUID uuid) throws NotFoundException {
+        // TODO: polling
         return runService.getSingle(uuid);
     }
 

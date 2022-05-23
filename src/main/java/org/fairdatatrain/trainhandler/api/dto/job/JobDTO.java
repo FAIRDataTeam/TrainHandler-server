@@ -54,6 +54,8 @@ public class JobDTO {
 
     private List<JobEventDTO> events;
 
+    private List<JobArtifactDTO> artifacts;
+
     private Instant createdAt;
 
     private Instant updatedAt;

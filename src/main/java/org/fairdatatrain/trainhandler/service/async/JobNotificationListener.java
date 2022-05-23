@@ -30,12 +30,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-public class JobEventNotificationListener {
+public class JobNotificationListener {
 
     private final Map<UUID, Object> locks = new HashMap<>();
 
     @EventListener
-    public void handleJobEventNotification(JobEventNotification notification) {
+    public void handleJobEventNotification(JobNotification notification) {
         if (locks.containsKey(notification.getJobUuid())) {
             synchronized (locks.get(notification.getJobUuid())) {
                 final Object lock = locks.remove(notification.getJobUuid());

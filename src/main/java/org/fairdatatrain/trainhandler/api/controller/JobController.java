@@ -24,25 +24,33 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
-import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
-import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
-import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
+import org.apache.coyote.Response;
+import org.fairdatatrain.trainhandler.api.dto.job.*;
+import org.fairdatatrain.trainhandler.data.model.JobArtifact;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.service.job.JobEventService;
+import org.fairdatatrain.trainhandler.service.job.artifact.JobArtifactService;
+import org.fairdatatrain.trainhandler.service.job.event.JobEventService;
 import org.fairdatatrain.trainhandler.service.job.JobService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
+import static java.lang.String.format;
 
 @Tag(name = "Runs")
 @RestController
@@ -56,6 +64,8 @@ public class JobController {
 
     private final JobEventService jobEventService;
 
+    private final JobArtifactService jobArtifactService;
+
     @GetMapping(path = "/{runUuid}/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<JobSimpleDTO> getJobs(@PathVariable UUID runUuid, Pageable pageable) {
         return jobService.getJobsForRun(runUuid, pageable);
@@ -68,15 +78,43 @@ public class JobController {
     public JobDTO getJob(
             @PathVariable UUID runUuid, @PathVariable UUID jobUuid
     ) throws NotFoundException {
+        // TODO: polling
         return jobService.getSingle(runUuid, jobUuid);
     }
-
+/*
+    @GetMapping(
+            path = "/{runUuid}/jobs/{jobUuid}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public DeferredResult<ResponseEntity<JobDTO>> pollNewerJobEvents(
+            @PathVariable UUID runUuid,
+            @PathVariable UUID jobUuid,
+            @RequestParam(required = false, defaultValue = "0") Instant since
+    ) {
+        // TODO: configurable timeout
+        final DeferredResult<ResponseEntity<JobDTO>> job = new DeferredResult<>(
+                10 * 1000L, ResponseEntity.status(HttpStatus.NOT_MODIFIED).build()
+        );
+        CompletableFuture.runAsync(() -> {
+            try {
+                job.setResult(jobService.poll(runUuid, jobUuid, since));
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                job.setResult(ResponseEntity.status(HttpStatus.NOT_MODIFIED).build());
+                // TODO: better error handling
+            }
+        });
+        return job;
+    }
+*/
     @GetMapping(
             path = "/{runUuid}/jobs/{jobUuid}/events",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public List<JobEventDTO> getJobEvents(
-            @PathVariable UUID runUuid, @PathVariable UUID jobUuid
+            @PathVariable UUID runUuid,
+            @PathVariable UUID jobUuid
     ) throws NotFoundException {
         return jobEventService.getEvents(runUuid, jobUuid);
     }
@@ -105,6 +143,39 @@ public class JobController {
             }
         });
         return events;
+    }
+
+    @GetMapping(
+            path = "/{runUuid}/jobs/{jobUuid}/artifacts",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<JobArtifactDTO> getJobArtifacts(
+            @PathVariable UUID runUuid, @PathVariable UUID jobUuid
+    ) throws NotFoundException {
+        return jobArtifactService.getArtifacts(runUuid, jobUuid);
+    }
+
+    @GetMapping(
+            path = "/{runUuid}/jobs/{jobUuid}/artifacts/{artifactUuid}/download",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Resource> getJobArtifactData(
+            @PathVariable UUID runUuid,
+            @PathVariable UUID jobUuid,
+            @PathVariable UUID artifactUuid
+    ) throws NotFoundException {
+        JobArtifact artifact = jobArtifactService.getArtifact(runUuid, jobUuid, artifactUuid);
+        byte[] data = jobArtifactService.getArtifactData(artifact);
+        ByteArrayResource resource = new ByteArrayResource(data);
+        return ResponseEntity
+                .ok()
+                .contentLength(artifact.getBytesize())
+                .contentType(MediaType.parseMediaType(artifact.getContentType()))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        format("attachment;filename=%s", artifact.getFilename())
+                )
+                .body(resource);
     }
 
     @PostMapping(

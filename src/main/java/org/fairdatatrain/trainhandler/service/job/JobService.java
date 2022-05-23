@@ -30,8 +30,10 @@ import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -62,5 +64,9 @@ public class JobService {
             throw new NotFoundException(ENTITY_NAME, jobUuid);
         }
         return jobMapper.toDTO(job);
+    }
+
+    public ResponseEntity<JobDTO> poll(UUID runUuid, UUID jobUuid, Instant since) {
+        return null;
     }
 }

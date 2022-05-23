@@ -49,7 +49,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RunService {
 
-    private static final String ENTITY_NAME = "Run";
+    public static final String ENTITY_NAME = "Run";
 
     private final RunRepository runRepository;
 

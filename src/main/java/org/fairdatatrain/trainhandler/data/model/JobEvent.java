@@ -22,17 +22,13 @@
  */
 package org.fairdatatrain.trainhandler.data.model;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
-import org.fairdatatrain.trainhandler.data.model.enums.JobEventType;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -40,7 +36,6 @@ import java.sql.Timestamp;
 
 @Entity(name = "JobEvent")
 @Table(name = "job_event")
-@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -49,27 +44,19 @@ import java.sql.Timestamp;
 public class JobEvent extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", columnDefinition = "job_event_type", nullable = false)
-    private JobEventType type;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "result_status", columnDefinition = "job_status")
     private JobStatus resultStatus;
 
     @NotNull
-    @Column(name = "occurred_at")
+    @Column(name = "occurred_at", nullable = false)
     private Timestamp occurredAt;
 
     @NotNull
     @Column(name = "message", nullable = false)
     private String message;
 
-    @Column(name = "payload", columnDefinition = "json")
-    @Type(type = "json")
-    private String payload;
-
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "job_id")
+    @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 }

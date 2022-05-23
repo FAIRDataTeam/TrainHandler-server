@@ -28,6 +28,8 @@ import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.PlanTarget;
 import org.fairdatatrain.trainhandler.data.model.Run;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.fairdatatrain.trainhandler.service.job.artifact.JobArtifactMapper;
+import org.fairdatatrain.trainhandler.service.job.event.JobEventMapper;
 import org.fairdatatrain.trainhandler.service.run.RunMapper;
 import org.fairdatatrain.trainhandler.service.station.StationMapper;
 import org.springframework.context.annotation.Lazy;
@@ -49,14 +51,18 @@ public class JobMapper {
 
     private final JobEventMapper jobEventMapper;
 
+    private final JobArtifactMapper jobArtifactMapper;
+
     public JobMapper(
             StationMapper stationMapper,
             JobEventMapper jobEventMapper,
+            JobArtifactMapper jobArtifactMapper,
             @Lazy RunMapper runMapper
     ) {
         this.stationMapper = stationMapper;
         this.runMapper = runMapper;
         this.jobEventMapper = jobEventMapper;
+        this.jobArtifactMapper = jobArtifactMapper;
     }
 
     public JobSimpleDTO toSimpleDTO(Job job) {
@@ -73,6 +79,7 @@ public class JobMapper {
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
+                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .runUuid(job.getRun().getUuid())
                 .build();
     }
@@ -93,6 +100,7 @@ public class JobMapper {
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .run(runMapper.toSimpleDTO(job.getRun()))
                 .events(job.getEvents().stream().map(jobEventMapper::toDTO).toList())
+                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .createdAt(job.getCreatedAt().toInstant())
                 .updatedAt(job.getUpdatedAt().toInstant())
                 .build();

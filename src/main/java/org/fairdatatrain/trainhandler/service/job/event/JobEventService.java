@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.job;
+package org.fairdatatrain.trainhandler.service.job.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,8 @@ import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
-import org.fairdatatrain.trainhandler.service.async.JobEventNotificationListener;
+import org.fairdatatrain.trainhandler.service.async.JobNotificationListener;
+import org.fairdatatrain.trainhandler.service.job.JobService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +61,7 @@ public class JobEventService {
 
     private final AsyncEventPublisher asyncEventPublisher;
 
-    private final JobEventNotificationListener jobEventNotificationListener;
+    private final JobNotificationListener jobNotificationListener;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -107,7 +108,7 @@ public class JobEventService {
         if (events.isEmpty()) {
             log.info("No events at this point");
             log.info("Starting to wait");
-            jobEventNotificationListener.wait(jobUuid);
+            jobNotificationListener.wait(jobUuid);
             log.info("Finished to wait");
             entityManager.flush();
             events = getEventsAfter(runUuid, jobUuid, afterEventUuid);

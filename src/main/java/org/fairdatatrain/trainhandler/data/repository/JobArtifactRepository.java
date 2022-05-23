@@ -20,10 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.model.enums;
+package org.fairdatatrain.trainhandler.data.repository;
 
-public enum JobEventType {
-    ARTEFACT,
-    INIT,
-    INFO
+import org.fairdatatrain.trainhandler.data.model.JobArtifact;
+import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface JobArtifactRepository extends BaseRepository<JobArtifact> {
 }

@@ -26,11 +26,11 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;
 
-public class JobEventNotification extends ApplicationEvent {
+public class JobNotification extends ApplicationEvent {
 
     private final UUID jobUuid;
 
-    JobEventNotification(Object source, UUID jobUuid) {
+    JobNotification(Object source, UUID jobUuid) {
         super(source);
         this.jobUuid = jobUuid;
     }

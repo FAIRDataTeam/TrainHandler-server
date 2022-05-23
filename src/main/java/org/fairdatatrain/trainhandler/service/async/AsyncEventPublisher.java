@@ -40,7 +40,7 @@ public class AsyncEventPublisher {
 
     public void publishNewJobEventNotification(final UUID jobUuid) {
         log.info(format("Publishing new job event notification for job %s", jobUuid));
-        publisher.publishEvent(new JobEventNotification(this, jobUuid));
+        publisher.publishEvent(new JobNotification(this, jobUuid));
     }
 
 }
