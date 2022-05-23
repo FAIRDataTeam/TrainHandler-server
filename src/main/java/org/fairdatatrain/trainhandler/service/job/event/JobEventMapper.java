@@ -29,8 +29,9 @@ import org.fairdatatrain.trainhandler.data.model.JobEvent;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
+
+import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
 @Component
 public class JobEventMapper {
@@ -47,7 +48,7 @@ public class JobEventMapper {
     }
 
     public JobEvent fromCreateDTO(JobEventCreateDTO reqDto, Job job) {
-        final Timestamp now = Timestamp.from(Instant.now());
+        final Timestamp now = now();
         return JobEvent
                 .builder()
                 .uuid(UUID.randomUUID())

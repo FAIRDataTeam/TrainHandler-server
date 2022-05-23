@@ -20,32 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.dispatch;
+package org.fairdatatrain.trainhandler.utils;
 
-import lombok.*;
+public class HashUtils {
+    private static final int MASK = 0xff;
 
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class DispatchPayload {
-
-    @NotNull
-    private UUID jobUuid;
-
-    @NotNull
-    private String secret;
-
-    @NotNull
-    private String callbackEventLocation;
-
-    @NotNull
-    private String callbackArtifactLocation;
-
-    @NotNull
-    private String trainUri;
+    public static String bytesToHex(byte[] hash) {
+        final StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            final String hex = Integer.toHexString(MASK & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 }

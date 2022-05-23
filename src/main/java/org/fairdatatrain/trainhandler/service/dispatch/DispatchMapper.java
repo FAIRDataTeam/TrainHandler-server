@@ -22,7 +22,8 @@
  */
 package org.fairdatatrain.trainhandler.service.dispatch;
 
-import org.fairdatatrain.trainhandler.api.controller.JobController;
+import org.fairdatatrain.trainhandler.api.controller.JobArtifactController;
+import org.fairdatatrain.trainhandler.api.controller.JobEventController;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,15 +35,23 @@ public class DispatchMapper {
     private String dispatchRoot;
 
     public DispatchPayload toPayload(Job job) {
-        final String callbackLocation = JobController.EVENT_CALLBACK_LOCATION
-                .replace("{runUuid}", job.getRun().getUuid().toString())
-                .replace("{jobUuid}", job.getUuid().toString());
         return DispatchPayload
                 .builder()
                 .jobUuid(job.getUuid())
                 .secret(job.getSecret())
                 .trainUri(job.getRun().getPlan().getTrain().getUri())
-                .callbackLocation(dispatchRoot + "/runs" + callbackLocation)
+                .callbackEventLocation(makeCallback(
+                        JobEventController.EVENT_CALLBACK_LOCATION, job
+                ))
+                .callbackArtifactLocation(makeCallback(
+                        JobArtifactController.ARTIFACT_CALLBACK_LOCATION, job
+                ))
                 .build();
+    }
+
+    private String makeCallback(String fragment, Job job) {
+        return dispatchRoot + "/runs" + fragment
+                .replace("{runUuid}", job.getRun().getUuid().toString())
+                .replace("{jobUuid}", job.getUuid().toString());
     }
 }

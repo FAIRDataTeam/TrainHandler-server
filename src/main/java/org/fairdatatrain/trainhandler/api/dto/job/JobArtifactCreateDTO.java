@@ -20,32 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.dispatch;
+package org.fairdatatrain.trainhandler.api.dto.job;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import java.time.Instant;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-public class DispatchPayload {
+public class JobArtifactCreateDTO {
 
     @NotNull
-    private UUID jobUuid;
+    private String displayName;
+
+    @NotNull
+    private String filename;
+
+    @NotNull
+    private String hash;
+
+    @NotNull
+    private Long bytesize;
+
+    @NotNull
+    private String contentType;
+
+    @NotNull
+    private Instant occurredAt;
+
+    @NotNull
+    private String remoteId;
 
     @NotNull
     private String secret;
 
     @NotNull
-    private String callbackEventLocation;
-
-    @NotNull
-    private String callbackArtifactLocation;
-
-    @NotNull
-    private String trainUri;
+    private String base64data;
 }

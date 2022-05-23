@@ -22,9 +22,17 @@
  */
 package org.fairdatatrain.trainhandler.service.job.artifact;
 
+import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactDTO;
+import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobArtifact;
+import org.fairdatatrain.trainhandler.data.model.enums.ArtifactStorage;
 import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
+import java.util.UUID;
+
+import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
 @Component
 public class JobArtifactMapper {
@@ -39,6 +47,25 @@ public class JobArtifactMapper {
                 .occurredAt(artifact.getOccurredAt().toInstant())
                 .createdAt(artifact.getCreatedAt().toInstant())
                 .updatedAt(artifact.getUpdatedAt().toInstant())
+                .build();
+    }
+
+    public JobArtifact fromCreateDTO(JobArtifactCreateDTO reqDto, Job job, byte[] data) {
+        final Timestamp now = now();
+        return JobArtifact
+                .builder()
+                .uuid(UUID.randomUUID())
+                .displayName(reqDto.getDisplayName())
+                .filename(reqDto.getFilename())
+                .hash(reqDto.getHash())
+                .bytesize(reqDto.getBytesize())
+                .contentType(reqDto.getContentType())
+                .data(data)
+                .storage(ArtifactStorage.POSTGRES)
+                .occurredAt(Timestamp.from(reqDto.getOccurredAt()))
+                .job(job)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
     }
 }

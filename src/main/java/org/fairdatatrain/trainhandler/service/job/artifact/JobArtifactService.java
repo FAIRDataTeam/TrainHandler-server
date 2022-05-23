@@ -24,20 +24,32 @@ package org.fairdatatrain.trainhandler.service.job.artifact;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactDTO;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobArtifact;
 import org.fairdatatrain.trainhandler.data.model.enums.ArtifactStorage;
 import org.fairdatatrain.trainhandler.data.repository.JobArtifactRepository;
+import org.fairdatatrain.trainhandler.data.repository.JobRepository;
+import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.job.JobService;
 import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.validation.ValidationException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static org.fairdatatrain.trainhandler.utils.HashUtils.bytesToHex;
 
 @Service
 @RequiredArgsConstructor
@@ -46,11 +58,16 @@ public class JobArtifactService {
 
     public static final String ENTITY_NAME = "JobArtifact";
 
+    private final JobRepository jobRepository;
+
     private final JobArtifactRepository jobArtifactRepository;
 
     private final JobArtifactMapper jobArtifactMapper;
 
     private final JobService jobService;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
 
     public JobArtifact getByIdOrThrow(UUID uuid) throws NotFoundException {
         return jobArtifactRepository
@@ -86,5 +103,50 @@ public class JobArtifactService {
         throw new RuntimeException(
                 format("Unsupported artifact storage: %s", artifact.getStorage())
         );
+    }
+
+    @Transactional
+    public JobArtifactDTO createArtifact(
+            UUID runUuid, UUID jobUuid, JobArtifactCreateDTO reqDto
+    ) throws NotFoundException, JobSecurityException {
+        final Job job = jobService.getByIdOrThrow(jobUuid);
+        if (!job.getRun().getUuid().equals(runUuid)) {
+            throw new NotFoundException(JobService.ENTITY_NAME, jobUuid);
+        }
+        if (!Objects.equals(job.getSecret(), reqDto.getSecret())) {
+            throw new JobSecurityException("Incorrect secret for creating job event");
+        }
+        if (job.getRemoteId() == null) {
+            job.setRemoteId(reqDto.getRemoteId());
+            jobRepository.save(job);
+        }
+        else if (!Objects.equals(job.getRemoteId(), reqDto.getRemoteId())) {
+            throw new JobSecurityException("Incorrect remote ID for creating job event");
+        }
+        final byte[] data = Base64.getDecoder().decode(reqDto.getBase64data());
+        validate(reqDto, data);
+        final JobArtifact jobArtifact = jobArtifactRepository.save(
+                jobArtifactMapper.fromCreateDTO(reqDto, job, data)
+        );
+        entityManager.flush();
+        entityManager.refresh(jobArtifact);
+        return jobArtifactMapper.toDTO(jobArtifact);
+    }
+
+    private void validate(JobArtifactCreateDTO reqDto, byte[] data) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        }
+        catch (NoSuchAlgorithmException exc) {
+            throw new RuntimeException("SHA-256 hashing is not supported");
+        }
+        final String hash = bytesToHex(digest.digest(data));
+        if (data.length != reqDto.getBytesize()) {
+            throw new ValidationException("Bytesize does not match");
+        }
+        if (!hash.equals(reqDto.getHash())) {
+            throw new ValidationException("SHA-256 hash does not match");
+        }
     }
 }
