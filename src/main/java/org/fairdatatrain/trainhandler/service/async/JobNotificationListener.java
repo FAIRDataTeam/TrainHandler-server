@@ -22,6 +22,7 @@
  */
 package org.fairdatatrain.trainhandler.service.async;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
@@ -29,18 +30,20 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import static java.lang.String.format;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JobNotificationListener {
 
-    private final Map<UUID, PriorityQueue<PollJobContainer>> queues = new HashMap<>();
+    private final Long pollTimeout;
+
+    private final Map<UUID, List<PollContainer<JobDTO>>> queues = new HashMap<>();
 
     @EventListener
     public void handleJobEventNotification(JobNotification notification) {
@@ -55,28 +58,23 @@ public class JobNotificationListener {
                 "Updating results for job '%s' (version '%s')",
                 job.getUuid(), job.getVersion()
         ));
+        final Instant now = Instant.now();
         if (queues.containsKey(job.getUuid())) {
-            while (!queues.get(job.getUuid()).isEmpty()) {
-                final PollJobContainer container = queues.get(job.getUuid()).peek();
-                if (container == null) {
-                    queues.get(job.getUuid()).poll();
-                }
-                else if (container.getVersion() <= job.getVersion()) {
-                    log.info(format(
-                            "Sending job for requested version: %s",
-                            container.getVersion()
-                    ));
-                    container.getResult().setResult(job);
-                    queues.get(job.getUuid()).poll();
-                }
-                else {
-                    log.info(format(
-                            "Next requested job version: %s",
-                            container.getVersion())
-                    );
-                    break;
-                }
-            }
+            final List<PollContainer<JobDTO>> remainings = new ArrayList<>();
+            queues.get(job.getUuid())
+                    .stream()
+                    .filter(container -> container.getTimeoutsAt().isAfter(now))
+                    .forEach(container -> {
+                        if (container.getVersion() <= job.getVersion()) {
+                            log.info(format("Sending job for requested version: %s",
+                                    container.getVersion()));
+                            container.getResult().setResult(job);
+                        }
+                        else {
+                            remainings.add(container);
+                        }
+                    });
+            queues.put(job.getUuid(), remainings);
         }
         log.info(format(
                 "Updating results for job '%s' (version '%s'): done",
@@ -86,14 +84,25 @@ public class JobNotificationListener {
 
     @Synchronized
     public void enqueue(UUID jobUuid, Long version, DeferredResult<JobDTO> result) {
+        final Instant now = Instant.now();
         if (!queues.containsKey(jobUuid)) {
-            queues.put(jobUuid, new PriorityQueue<>());
+            queues.put(jobUuid, new ArrayList<>());
+        }
+        else {
+            final List<PollContainer<JobDTO>> remainings = new ArrayList<>();
+            queues.get(jobUuid).forEach(container -> {
+                if (container.getTimeoutsAt().isAfter(now)) {
+                    remainings.add(container);
+                }
+            });
+            queues.put(jobUuid, remainings);
         }
         queues.get(jobUuid).add(
-                PollJobContainer.builder()
-                        .version(version)
-                        .result(result)
-                        .build()
+                new PollContainer<>(
+                        version,
+                        Instant.now().plus(pollTimeout, ChronoUnit.MILLIS),
+                        result
+                )
         );
     }
 }

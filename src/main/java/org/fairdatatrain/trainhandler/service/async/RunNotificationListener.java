@@ -22,6 +22,7 @@
  */
 package org.fairdatatrain.trainhandler.service.async;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
@@ -29,15 +30,20 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static java.lang.String.format;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class RunNotificationListener {
 
-    private final Map<UUID, PriorityQueue<PollRunContainer>> queues = new HashMap<>();
+    private final Long pollTimeout;
+
+    private final Map<UUID, List<PollContainer<RunDTO>>> queues = new HashMap<>();
 
     @EventListener
     public void handleJobEventNotification(JobNotification notification) {
@@ -50,28 +56,23 @@ public class RunNotificationListener {
                 "Updating results for run '%s' (version '%s')",
                 run.getUuid(), run.getVersion())
         );
+        final Instant now = Instant.now();
         if (queues.containsKey(run.getUuid())) {
-            while (!queues.get(run.getUuid()).isEmpty()) {
-                final PollRunContainer container = queues.get(run.getUuid()).peek();
-                if (container == null) {
-                    queues.get(run.getUuid()).poll();
-                }
-                else if (container.getVersion() <= run.getVersion()) {
-                    log.info(format(
-                            "Sending run for requested version: %s",
-                            container.getVersion())
-                    );
-                    container.getResult().setResult(run);
-                    queues.get(run.getUuid()).poll();
-                }
-                else {
-                    log.info(format(
-                            "Next requested run version: %s",
-                            container.getVersion())
-                    );
-                    break;
-                }
-            }
+            final List<PollContainer<RunDTO>> remainings = new ArrayList<>();
+            queues.get(run.getUuid())
+                    .stream()
+                    .filter(container -> container.getTimeoutsAt().isAfter(now))
+                    .forEach(container -> {
+                        if (container.getVersion() <= run.getVersion()) {
+                            log.info(format("Sending run for requested version: %s",
+                                    container.getVersion()));
+                            container.getResult().setResult(run);
+                        }
+                        else {
+                            remainings.add(container);
+                        }
+                    });
+            queues.put(run.getUuid(), remainings);
         }
         log.info(format(
                 "Updating results for run '%s' (version '%s'): done",
@@ -81,14 +82,25 @@ public class RunNotificationListener {
 
     @Synchronized
     public void enqueue(UUID runUuid, Long version, DeferredResult<RunDTO> result) {
+        final Instant now = Instant.now();
         if (!queues.containsKey(runUuid)) {
-            queues.put(runUuid, new PriorityQueue<>());
+            queues.put(runUuid, new ArrayList<>());
+        }
+        else {
+            final List<PollContainer<RunDTO>> remainings = new ArrayList<>();
+            queues.get(runUuid).forEach(container -> {
+                if (container.getTimeoutsAt().isAfter(now)) {
+                    remainings.add(container);
+                }
+            });
+            queues.put(runUuid, remainings);
         }
         queues.get(runUuid).add(
-                PollRunContainer.builder()
-                        .version(version)
-                        .result(result)
-                        .build()
+                new PollContainer<>(
+                        version,
+                        Instant.now().plus(pollTimeout, ChronoUnit.MILLIS),
+                        result
+                )
         );
     }
 

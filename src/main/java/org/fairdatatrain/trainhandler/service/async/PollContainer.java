@@ -23,22 +23,25 @@
 package org.fairdatatrain.trainhandler.service.async;
 
 import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
 import org.springframework.web.context.request.async.DeferredResult;
+
+import java.time.Instant;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class PollJobContainer implements Comparable<PollJobContainer> {
+public class PollContainer<T> implements Comparable<PollContainer<?>> {
 
     private Long version;
 
-    private DeferredResult<JobDTO> result;
+    private Instant timeoutsAt;
+
+    private DeferredResult<T> result;
 
     @Override
-    public int compareTo(PollJobContainer o) {
+    public int compareTo(PollContainer o) {
         return version.compareTo(o.version);
     }
 }
