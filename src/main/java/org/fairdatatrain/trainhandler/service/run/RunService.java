@@ -98,6 +98,7 @@ public class RunService {
         jobRepository.saveAll(jobs);
         entityManager.flush();
         entityManager.refresh(newRun);
+        newRun.getJobs().forEach(entityManager::refresh);
         runDispatcher.dispatchNewRun(newRun);
         return runMapper.toDTO(newRun);
     }
