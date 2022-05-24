@@ -30,13 +30,14 @@ import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobEvent;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 import org.fairdatatrain.trainhandler.data.repository.JobEventRepository;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
-import org.fairdatatrain.trainhandler.service.async.JobNotificationListener;
 import org.fairdatatrain.trainhandler.service.job.JobService;
 import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.stereotype.Service;
@@ -44,9 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -68,8 +67,6 @@ public class JobEventService {
     private final JobEventMapper jobEventMapper;
 
     private final AsyncEventPublisher asyncEventPublisher;
-
-    private final JobNotificationListener jobNotificationListener;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -105,6 +102,7 @@ public class JobEventService {
         }
         if (job.getRemoteId() == null) {
             job.setRemoteId(reqDto.getRemoteId());
+            job.getRun().setStatus(getNextRunStatus(job, reqDto));
             jobRepository.save(job);
         }
         else if (!Objects.equals(job.getRemoteId(), reqDto.getRemoteId())) {
@@ -112,6 +110,7 @@ public class JobEventService {
         }
         if (reqDto.getResultStatus() != null) {
             job.setStatus(reqDto.getResultStatus());
+
         }
         final JobEvent jobEvent = jobEventRepository.save(
                 jobEventMapper.fromCreateDTO(reqDto, job)
@@ -130,5 +129,32 @@ public class JobEventService {
         final RunDTO run = runService.getSingle(runUuid);
         final JobDTO job = jobService.getSingle(runUuid, jobUuid);
         asyncEventPublisher.publishNewJobEventNotification(run, job);
+    }
+
+    private RunStatus getNextRunStatus(Job job, JobEventCreateDTO reqDto) {
+        final List<JobStatus> jobStatuses = job.getRun().getJobs().stream().map(job1 -> {
+            if (job1.getUuid() == job.getUuid()) {
+                return reqDto.getResultStatus();
+            }
+            else {
+                return job.getStatus();
+            }
+        }).toList();
+        if (jobStatuses.stream().anyMatch(JobStatus.RUNNING::equals)) {
+            return RunStatus.RUNNING;
+        }
+        if (jobStatuses.stream().anyMatch(JobStatus.ABORTING::equals)) {
+            return RunStatus.ABORTING;
+        }
+        if (jobStatuses.stream().allMatch(JobStatus.ERRORED::equals)) {
+            return RunStatus.ERRORED;
+        }
+        if (jobStatuses.stream().allMatch(JobStatus.FINISHED::equals)) {
+            return RunStatus.FINISHED;
+        }
+        if (jobStatuses.stream().anyMatch(JobStatus.FAILED::equals)) {
+            return RunStatus.FAILED;
+        }
+        return job.getRun().getStatus();
     }
 }

@@ -31,7 +31,6 @@ import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
 import org.fairdatatrain.trainhandler.service.run.RunService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +69,6 @@ public class RunController {
             @PathVariable UUID uuid,
             @RequestParam(required = false, defaultValue = "0") Long after
     ) throws NotFoundException {
-        // TODO: configurable timeout
         final RunDTO currentRun = runService.getSingle(uuid);
         final DeferredResult<RunDTO> result = new DeferredResult<>(
                 pollTimeout, currentRun
@@ -87,7 +85,7 @@ public class RunController {
     public RunDTO update(
             @PathVariable UUID uuid, @Valid @RequestBody RunUpdateDTO reqDto
     ) throws NotFoundException, CannotPerformException {
-        RunDTO run = runService.update(uuid, reqDto);
+        final RunDTO run = runService.update(uuid, reqDto);
         asyncEventPublisher.publishNewJobEventNotification(run);
         return run;
     }
