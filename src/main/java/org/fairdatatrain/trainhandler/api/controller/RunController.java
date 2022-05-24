@@ -29,7 +29,9 @@ import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunUpdateDTO;
 import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
+import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
 import org.fairdatatrain.trainhandler.service.run.RunService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Runs")
 @RestController
@@ -46,6 +47,10 @@ import java.util.concurrent.CompletableFuture;
 public class RunController {
 
     private final RunService runService;
+
+    private final AsyncEventPublisher asyncEventPublisher;
+
+    private final Long pollTimeout;
 
     @PostMapping(
             path = "",
@@ -67,19 +72,11 @@ public class RunController {
     ) throws NotFoundException {
         // TODO: configurable timeout
         final RunDTO currentRun = runService.getSingle(uuid);
-        final DeferredResult<RunDTO> run = new DeferredResult<>(
-                10 * 1000L, currentRun
+        final DeferredResult<RunDTO> result = new DeferredResult<>(
+                pollTimeout, currentRun
         );
-        CompletableFuture.runAsync(() -> {
-            try {
-                run.setResult(runService.poll(uuid, after, currentRun));
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-                run.setResult(null);
-            }
-        });
-        return run;
+        runService.poll(uuid, result, after, currentRun);
+        return result;
     }
 
     @PutMapping(
@@ -90,6 +87,8 @@ public class RunController {
     public RunDTO update(
             @PathVariable UUID uuid, @Valid @RequestBody RunUpdateDTO reqDto
     ) throws NotFoundException, CannotPerformException {
-        return runService.update(uuid, reqDto);
+        RunDTO run = runService.update(uuid, reqDto);
+        asyncEventPublisher.publishNewJobEventNotification(run);
+        return run;
     }
 }

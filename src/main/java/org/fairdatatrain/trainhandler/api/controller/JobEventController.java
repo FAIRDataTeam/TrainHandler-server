@@ -30,13 +30,10 @@ import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.job.event.JobEventService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Runs")
 @RestController
@@ -57,32 +54,6 @@ public class JobEventController {
             @PathVariable UUID jobUuid
     ) throws NotFoundException {
         return jobEventService.getEvents(runUuid, jobUuid);
-    }
-
-    @GetMapping(
-            path = "/{runUuid}/jobs/{jobUuid}/events/poll",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public DeferredResult<List<JobEventDTO>> pollNewerJobEvents(
-            @PathVariable UUID runUuid,
-            @PathVariable UUID jobUuid,
-            @RequestParam(required = false) UUID afterEventUuid
-    ) {
-        // TODO: configurable timeout
-        final DeferredResult<List<JobEventDTO>> events = new DeferredResult<>(
-                10 * 1000L, Collections.emptyList()
-        );
-        CompletableFuture.runAsync(() -> {
-            try {
-                events.setResult(jobEventService.pollEvents(runUuid, jobUuid, afterEventUuid));
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-                events.setResult(Collections.emptyList());
-                // TODO: better error handling
-            }
-        });
-        return events;
     }
 
     @PostMapping(

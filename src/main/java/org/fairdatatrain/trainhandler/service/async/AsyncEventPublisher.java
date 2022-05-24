@@ -24,10 +24,10 @@ package org.fairdatatrain.trainhandler.service.async;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 import static java.lang.String.format;
 
@@ -38,14 +38,24 @@ public class AsyncEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
-    public void publishNewJobEventNotification(final UUID jobUuid, final UUID runUuid) {
+    public void publishNewJobEventNotification(final RunDTO run, final JobDTO job) {
         log.info(
                 format(
-                        "Publishing new job event notification for job %s (run %s)",
-                        jobUuid, runUuid
+                        "Publishing new job notification for job %s (run %s)",
+                        job.getUuid(), run.getUuid()
                 )
         );
-        publisher.publishEvent(new JobNotification(this, jobUuid, runUuid));
+        publisher.publishEvent(new JobNotification(this, run, job));
+    }
+
+    public void publishNewJobEventNotification(final RunDTO run) {
+        log.info(
+                format(
+                        "Publishing new run notification for run %s",
+                        run.getUuid()
+                )
+        );
+        publisher.publishEvent(new JobNotification(this, run, null));
     }
 
 }

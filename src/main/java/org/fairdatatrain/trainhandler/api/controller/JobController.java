@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.job.*;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.job.JobService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Runs")
 @RestController
@@ -43,6 +43,8 @@ import java.util.concurrent.CompletableFuture;
 public class JobController {
 
     private final JobService jobService;
+
+    private final Long pollTimeout;
 
     @GetMapping(path = "/{runUuid}/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<JobSimpleDTO> getJobs(@PathVariable UUID runUuid, Pageable pageable) {
@@ -58,21 +60,11 @@ public class JobController {
             @PathVariable UUID jobUuid,
             @RequestParam(required = false, defaultValue = "0") Long after
     ) throws NotFoundException {
-        // TODO: configurable timeout
         final JobDTO currentJob = jobService.getSingle(runUuid, jobUuid);
-        final DeferredResult<JobDTO> job = new DeferredResult<>(
-                10 * 1000L, currentJob
+        final DeferredResult<JobDTO> result = new DeferredResult<>(
+                pollTimeout, currentJob
         );
-        CompletableFuture.runAsync(() -> {
-            try {
-                job.setResult(jobService.poll(runUuid, jobUuid, after, currentJob));
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-                job.setResult(null);
-                // TODO: better error handling
-            }
-        });
-        return job;
+        jobService.poll(jobUuid, result, after, currentJob);
+        return result;
     }
 }

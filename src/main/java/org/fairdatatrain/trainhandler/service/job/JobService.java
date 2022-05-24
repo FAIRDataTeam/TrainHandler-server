@@ -34,10 +34,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
@@ -76,17 +79,18 @@ public class JobService {
     }
 
     @Transactional
-    public JobDTO poll(
-            UUID runUuid, UUID jobUuid, Long version, JobDTO currentJob
-    ) throws InterruptedException, NotFoundException {
+    public void poll(
+            UUID jobUuid,
+            DeferredResult<JobDTO> result,
+            Long version,
+            JobDTO currentJob
+    ) {
+        log.info(format("REQUESTED VERSION: %s", version));
+        log.info(format("CURRENT VERSION: %s", currentJob.getVersion()));
         if (version < currentJob.getVersion()) {
-            return currentJob;
+            result.setResult(currentJob);
         }
-        log.info("No job update at this point");
-        log.info("Starting to wait");
-        jobNotificationListener.wait(jobUuid);
-        log.info("Finished to wait");
-        entityManager.flush();
-        return getSingle(runUuid, jobUuid);
+        log.info("No job update at this point, enqueueing...");
+        jobNotificationListener.enqueue(jobUuid, version, result);
     }
 }

@@ -22,27 +22,27 @@
  */
 package org.fairdatatrain.trainhandler.service.async;
 
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.springframework.context.ApplicationEvent;
-
-import java.util.UUID;
 
 public class JobNotification extends ApplicationEvent {
 
-    private final UUID jobUuid;
+    private final RunDTO run;
 
-    private final UUID runUuid;
+    private final JobDTO job;
 
-    JobNotification(Object source, UUID jobUuid, UUID runUuid) {
+    JobNotification(Object source, RunDTO run, JobDTO job) {
         super(source);
-        this.jobUuid = jobUuid;
-        this.runUuid = runUuid;
+        this.run = run;
+        this.job = job;
     }
 
-    public UUID getJobUuid() {
-        return jobUuid;
+    public RunDTO getRun() {
+        return run;
     }
 
-    public UUID getRunUuid() {
-        return runUuid;
+    public JobDTO getJob() {
+        return job;
     }
 }

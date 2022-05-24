@@ -24,8 +24,10 @@ package org.fairdatatrain.trainhandler.service.job.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobEvent;
 import org.fairdatatrain.trainhandler.data.repository.JobEventRepository;
@@ -36,6 +38,7 @@ import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
 import org.fairdatatrain.trainhandler.service.async.JobNotificationListener;
 import org.fairdatatrain.trainhandler.service.job.JobService;
+import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +58,8 @@ public class JobEventService {
     private final RunRepository runRepository;
 
     private final JobRepository jobRepository;
+
+    private final RunService runService;
 
     private final JobService jobService;
 
@@ -85,38 +90,6 @@ public class JobEventService {
                 .parallelStream()
                 .map(jobEventMapper::toDTO)
                 .toList();
-    }
-
-    private List<JobEventDTO> getEventsAfter(
-            UUID runUuid, UUID jobUuid, UUID afterEventUuid
-    ) throws NotFoundException {
-        if (afterEventUuid == null) {
-            return getEvents(runUuid, jobUuid);
-        }
-        final JobEvent event = getByIdOrThrow(afterEventUuid);
-        return jobEventRepository
-                .findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(
-                        event.getJob(), event.getOccurredAt()
-                )
-                .parallelStream()
-                .map(jobEventMapper::toDTO)
-                .toList();
-    }
-
-    @Transactional
-    public List<JobEventDTO> pollEvents(
-            UUID runUuid, UUID jobUuid, UUID afterEventUuid
-    ) throws NotFoundException, InterruptedException {
-        List<JobEventDTO> events = getEventsAfter(runUuid, jobUuid, afterEventUuid);
-        if (events.isEmpty()) {
-            log.info("No events at this point");
-            log.info("Starting to wait");
-            jobNotificationListener.wait(jobUuid);
-            log.info("Finished to wait");
-            entityManager.flush();
-            events = getEventsAfter(runUuid, jobUuid, afterEventUuid);
-        }
-        return events;
     }
 
     @Transactional
@@ -152,7 +125,10 @@ public class JobEventService {
         return jobEventMapper.toDTO(jobEvent);
     }
 
-    public void notify(UUID jobUuid, UUID runUuid) {
-        asyncEventPublisher.publishNewJobEventNotification(jobUuid, runUuid);
+    @Transactional
+    public void notify(UUID jobUuid, UUID runUuid) throws NotFoundException {
+        final RunDTO run = runService.getSingle(runUuid);
+        final JobDTO job = jobService.getSingle(runUuid, jobUuid);
+        asyncEventPublisher.publishNewJobEventNotification(run, job);
     }
 }

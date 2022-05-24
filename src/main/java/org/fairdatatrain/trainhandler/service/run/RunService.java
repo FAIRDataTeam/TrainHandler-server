@@ -41,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -114,19 +115,18 @@ public class RunService {
     }
 
     @Transactional
-    public RunDTO poll(
-            UUID runUuid, Long version, RunDTO currentRun
-    ) throws InterruptedException, NotFoundException {
+    public void poll(
+            UUID runUuid,
+            DeferredResult<RunDTO> result,
+            Long version,
+            RunDTO currentRun
+    ) {
         log.info(format("REQUESTED VERSION: %s", version));
         log.info(format("CURRENT VERSION: %s", currentRun.getVersion()));
         if (version < currentRun.getVersion()) {
-            return currentRun;
+            result.setResult(currentRun);
         }
-        log.info("No run update at this point");
-        log.info("Starting to wait");
-        runNotificationListener.wait(runUuid);
-        log.info("Finished to wait");
-        entityManager.flush();
-        return getSingle(runUuid);
+        log.info("No run update at this point, enqueueing...");
+        runNotificationListener.enqueue(runUuid, version, result);
     }
 }

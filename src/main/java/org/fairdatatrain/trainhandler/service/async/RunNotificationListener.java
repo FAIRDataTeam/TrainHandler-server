@@ -22,38 +22,74 @@
  */
 package org.fairdatatrain.trainhandler.service.async;
 
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static java.lang.String.format;
 
 @Component
+@Slf4j
 public class RunNotificationListener {
 
-    private final Map<UUID, Object> locks = new HashMap<>();
+    private final Map<UUID, PriorityQueue<PollRunContainer>> queues = new HashMap<>();
 
     @EventListener
     public void handleJobEventNotification(JobNotification notification) {
-        if (locks.containsKey(notification.getRunUuid())) {
-            synchronized (locks.get(notification.getRunUuid())) {
-                final Object lock = locks.remove(notification.getRunUuid());
-                lock.notifyAll();
+        updateResults(notification.getRun());
+    }
+
+    @Synchronized
+    public void updateResults(RunDTO run) {
+        log.info(format(
+                "Updating results for run '%s' (version '%s')",
+                run.getUuid(), run.getVersion())
+        );
+        if (queues.containsKey(run.getUuid())) {
+            while (!queues.get(run.getUuid()).isEmpty()) {
+                final PollRunContainer container = queues.get(run.getUuid()).peek();
+                if (container == null) {
+                    queues.get(run.getUuid()).poll();
+                }
+                else if (container.getVersion() <= run.getVersion()) {
+                    log.info(format(
+                            "Sending run for requested version: %s",
+                            container.getVersion())
+                    );
+                    container.getResult().setResult(run);
+                    queues.get(run.getUuid()).poll();
+                }
+                else {
+                    log.info(format(
+                            "Next requested run version: %s",
+                            container.getVersion())
+                    );
+                    break;
+                }
             }
         }
+        log.info(format(
+                "Updating results for run '%s' (version '%s'): done",
+                run.getUuid(), run.getVersion())
+        );
     }
 
-    private void prepare(UUID runUuid) {
-        if (!locks.containsKey(runUuid)) {
-            locks.put(runUuid, new Object());
+    @Synchronized
+    public void enqueue(UUID runUuid, Long version, DeferredResult<RunDTO> result) {
+        if (!queues.containsKey(runUuid)) {
+            queues.put(runUuid, new PriorityQueue<>());
         }
+        queues.get(runUuid).add(
+                PollRunContainer.builder()
+                        .version(version)
+                        .result(result)
+                        .build()
+        );
     }
 
-    public void wait(UUID runUuid) throws InterruptedException {
-        prepare(runUuid);
-        synchronized (locks.get(runUuid)) {
-            locks.get(runUuid).wait();
-        }
-    }
 }
