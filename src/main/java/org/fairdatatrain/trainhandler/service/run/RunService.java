@@ -47,6 +47,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -115,6 +117,8 @@ public class RunService {
     public RunDTO poll(
             UUID runUuid, Long version, RunDTO currentRun
     ) throws InterruptedException, NotFoundException {
+        log.info(format("REQUESTED VERSION: %s", version));
+        log.info(format("CURRENT VERSION: %s", currentRun.getVersion()));
         if (version < currentRun.getVersion()) {
             return currentRun;
         }
