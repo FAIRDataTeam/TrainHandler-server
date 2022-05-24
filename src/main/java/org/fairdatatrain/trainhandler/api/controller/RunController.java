@@ -50,7 +50,8 @@ public class RunController {
     @PostMapping(
             path = "",
             consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(code = HttpStatus.CREATED)
     public RunDTO create(@Valid @RequestBody RunCreateDTO reqDto) throws NotFoundException {
         return runService.create(reqDto);
@@ -76,7 +77,6 @@ public class RunController {
             catch (Exception ex) {
                 ex.printStackTrace();
                 run.setResult(null);
-                // TODO: better error handling
             }
         });
         return run;
@@ -85,11 +85,11 @@ public class RunController {
     @PutMapping(
             path = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public RunDTO update(
             @PathVariable UUID uuid, @Valid @RequestBody RunUpdateDTO reqDto
     ) throws NotFoundException, CannotPerformException {
-        // TODO: abort? duplicate?
         return runService.update(uuid, reqDto);
     }
 }

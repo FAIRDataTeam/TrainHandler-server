@@ -30,6 +30,7 @@ import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobEvent;
 import org.fairdatatrain.trainhandler.data.repository.JobEventRepository;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
+import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
@@ -50,6 +51,8 @@ import java.util.UUID;
 public class JobEventService {
 
     public static final String ENTITY_NAME = "JobEvent";
+
+    private final RunRepository runRepository;
 
     private final JobRepository jobRepository;
 
@@ -136,11 +139,14 @@ public class JobEventService {
         }
         if (reqDto.getResultStatus() != null) {
             job.setStatus(reqDto.getResultStatus());
-            jobRepository.save(job);
         }
         final JobEvent jobEvent = jobEventRepository.save(
                 jobEventMapper.fromCreateDTO(reqDto, job)
         );
+        job.setVersion(jobEvent.getUpdatedAt().toInstant().toEpochMilli());
+        jobRepository.save(job);
+        job.getRun().setVersion(job.getVersion());
+        runRepository.save(job.getRun());
         entityManager.flush();
         entityManager.refresh(jobEvent);
         return jobEventMapper.toDTO(jobEvent);

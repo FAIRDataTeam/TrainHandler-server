@@ -31,6 +31,7 @@ import org.fairdatatrain.trainhandler.data.model.JobArtifact;
 import org.fairdatatrain.trainhandler.data.model.enums.ArtifactStorage;
 import org.fairdatatrain.trainhandler.data.repository.JobArtifactRepository;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
+import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.job.JobService;
@@ -57,6 +58,8 @@ import static org.fairdatatrain.trainhandler.utils.HashUtils.bytesToHex;
 public class JobArtifactService {
 
     public static final String ENTITY_NAME = "JobArtifact";
+
+    private final RunRepository runRepository;
 
     private final JobRepository jobRepository;
 
@@ -118,7 +121,6 @@ public class JobArtifactService {
         }
         if (job.getRemoteId() == null) {
             job.setRemoteId(reqDto.getRemoteId());
-            jobRepository.save(job);
         }
         else if (!Objects.equals(job.getRemoteId(), reqDto.getRemoteId())) {
             throw new JobSecurityException("Incorrect remote ID for creating job event");
@@ -128,6 +130,10 @@ public class JobArtifactService {
         final JobArtifact jobArtifact = jobArtifactRepository.save(
                 jobArtifactMapper.fromCreateDTO(reqDto, job, data)
         );
+        job.setVersion(jobArtifact.getUpdatedAt().toInstant().toEpochMilli());
+        jobRepository.save(job);
+        job.getRun().setVersion(job.getVersion());
+        runRepository.save(job.getRun());
         entityManager.flush();
         entityManager.refresh(jobArtifact);
         return jobArtifactMapper.toDTO(jobArtifact);

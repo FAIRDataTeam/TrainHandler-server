@@ -63,7 +63,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorDTO> handleCannotDeleteException(CannotPerformException exception) {
         return new ResponseEntity<>(
                 new ErrorDTO(
-                        "HTTP-400",
+                        "HTTP-400-DeletionError",
                         format(
                                 "Cannot perform %s on entity %s (with %s)",
                                 exception.getOperation(),
@@ -79,7 +79,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorDTO> handleValidationException(ValidationException exception) {
         return new ResponseEntity<>(
                 new ErrorDTO(
-                        "HTTP-400",
+                        "HTTP-400-ValidationError",
                         exception.getMessage()
                 ),
                 HttpStatus.BAD_REQUEST

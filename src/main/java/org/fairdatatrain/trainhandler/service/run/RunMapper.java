@@ -79,10 +79,6 @@ public class RunMapper {
         final List<JobSimpleDTO> jobs = run.getJobs().stream()
                 .map(jobMapper::toSimpleDTO)
                 .toList();
-        final Long version = jobs.stream()
-                .map(JobSimpleDTO::getVersion)
-                .max(Long::compareTo)
-                .orElse(0L);
         return RunDTO.builder()
                 .uuid(run.getUuid())
                 .displayName(run.getDisplayName())
@@ -90,7 +86,7 @@ public class RunMapper {
                 .status(run.getStatus())
                 .plan(planMapper.toSimpleDTO(run.getPlan()))
                 .jobs(jobs)
-                .version(version)
+                .version(run.getVersion())
                 .shouldStartAt(
                         Optional.ofNullable(run.getShouldStartAt())
                                 .map(Timestamp::toInstant)
@@ -110,6 +106,7 @@ public class RunMapper {
 
     public Run fromCreateDTO(RunCreateDTO reqDto, Plan plan) {
         final Timestamp now = now();
+        final Long version = now.toInstant().toEpochMilli();
         return Run.builder()
                 .uuid(UUID.randomUUID())
                 .displayName(reqDto.getDisplayName())
@@ -126,14 +123,17 @@ public class RunMapper {
                 .finishedAt(null)
                 .createdAt(now)
                 .updatedAt(now)
+                .version(version)
                 .build();
     }
 
     public Run fromUpdateDTO(RunUpdateDTO reqDto, Run run) {
         final Timestamp now = now();
+        final Long version = now.toInstant().toEpochMilli();
         run.setDisplayName(reqDto.getDisplayName());
         run.setNote(reqDto.getNote());
         run.setUpdatedAt(now);
+        run.setVersion(version);
         return run;
     }
 }

@@ -67,6 +67,9 @@ public class Run extends BaseEntity {
     @Column(name = "finished_at")
     private Timestamp finishedAt;
 
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "plan_id")
