@@ -22,40 +22,26 @@
  */
 package org.fairdatatrain.trainhandler.service.async;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
-import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import lombok.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
-import static java.lang.String.format;
+import java.time.Instant;
 
-@Component
 @AllArgsConstructor
-@Slf4j
-public class AsyncEventPublisher {
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class PollContainer<T> implements Comparable<PollContainer<?>> {
 
-    private final ApplicationEventPublisher publisher;
+    private Long version;
 
-    public void publishNewJobEventNotification(final RunDTO run, final JobDTO job) {
-        log.info(
-                format(
-                        "Publishing new job notification for job %s (run %s)",
-                        job.getUuid(), run.getUuid()
-                )
-        );
-        publisher.publishEvent(new JobNotification(this, run, job));
+    private Instant timeoutsAt;
+
+    private DeferredResult<T> result;
+
+    @Override
+    public int compareTo(PollContainer o) {
+        return version.compareTo(o.version);
     }
-
-    public void publishNewJobEventNotification(final RunDTO run) {
-        log.info(
-                format(
-                        "Publishing new run notification for run %s",
-                        run.getUuid()
-                )
-        );
-        publisher.publishEvent(new JobNotification(this, run, null));
-    }
-
 }

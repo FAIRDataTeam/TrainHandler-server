@@ -24,69 +24,50 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
-import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
-import org.fairdatatrain.trainhandler.api.dto.run.RunUpdateDTO;
-import org.fairdatatrain.trainhandler.exception.CannotPerformException;
+import org.fairdatatrain.trainhandler.api.dto.job.*;
+import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
-import org.fairdatatrain.trainhandler.service.run.RunService;
-import org.springframework.http.HttpStatus;
+import org.fairdatatrain.trainhandler.service.job.event.JobEventService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Runs")
 @RestController
 @RequestMapping("/runs")
 @RequiredArgsConstructor
-public class RunController {
+public class JobEventController {
 
-    private final RunService runService;
+    public static final String EVENT_CALLBACK_LOCATION = "/{runUuid}/jobs/{jobUuid}/events";
 
-    private final AsyncEventPublisher asyncEventPublisher;
-
-    private final Long pollTimeout;
-
-    @PostMapping(
-            path = "",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public RunDTO create(@Valid @RequestBody RunCreateDTO reqDto) throws NotFoundException {
-        return runService.create(reqDto);
-    }
+    private final JobEventService jobEventService;
 
     @GetMapping(
-            path = "/{uuid}",
+            path = "/{runUuid}/jobs/{jobUuid}/events",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public DeferredResult<RunDTO> pollRun(
-            @PathVariable UUID uuid,
-            @RequestParam(required = false, defaultValue = "0") Long after
+    public List<JobEventDTO> getJobEvents(
+            @PathVariable UUID runUuid,
+            @PathVariable UUID jobUuid
     ) throws NotFoundException {
-        final RunDTO currentRun = runService.getSingle(uuid);
-        final DeferredResult<RunDTO> result = new DeferredResult<>(
-                pollTimeout, currentRun
-        );
-        runService.poll(uuid, result, after, currentRun);
-        return result;
+        return jobEventService.getEvents(runUuid, jobUuid);
     }
 
-    @PutMapping(
-            path = "/{uuid}",
+    @PostMapping(
+            path = EVENT_CALLBACK_LOCATION,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public RunDTO update(
-            @PathVariable UUID uuid, @Valid @RequestBody RunUpdateDTO reqDto
-    ) throws NotFoundException, CannotPerformException {
-        final RunDTO run = runService.update(uuid, reqDto);
-        asyncEventPublisher.publishNewJobEventNotification(run);
-        return run;
+    public JobEventDTO addJobEvent(
+            @PathVariable UUID runUuid,
+            @PathVariable UUID jobUuid,
+            @RequestBody @Valid JobEventCreateDTO reqDto
+    ) throws NotFoundException, JobSecurityException {
+        final JobEventDTO dto = jobEventService.createEvent(runUuid, jobUuid, reqDto);
+        jobEventService.notify(jobUuid, runUuid);
+        return dto;
     }
 }

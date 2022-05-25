@@ -59,4 +59,6 @@ public class RunDTO {
     private Instant createdAt;
 
     private Instant updatedAt;
+
+    private Long version;
 }

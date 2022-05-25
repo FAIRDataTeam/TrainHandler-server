@@ -20,45 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.job;
+package org.fairdatatrain.trainhandler.config;
 
-import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+@Configuration
+public class AsyncConfig {
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder(toBuilder = true)
-public class JobDTO {
+    // TODO: custom config properties
+    @Value("${poll.timeout:10000}")
+    private final Long pollTimeout = 10000L;
 
-    private UUID uuid;
-
-    private String remoteId;
-
-    private JobStatus status;
-
-    private Instant startedAt;
-
-    private Instant finishedAt;
-
-    private StationSimpleDTO target;
-
-    private RunSimpleDTO run;
-
-    private List<JobEventDTO> events;
-
-    private List<JobArtifactDTO> artifacts;
-
-    private Instant createdAt;
-
-    private Instant updatedAt;
-
-    private Long version;
+    @Bean("pollTimeout")
+    public Long getPollTimeout() {
+        return pollTimeout;
+    }
 }

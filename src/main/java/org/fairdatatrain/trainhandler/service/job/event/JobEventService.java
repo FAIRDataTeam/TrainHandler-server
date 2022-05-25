@@ -20,28 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.job;
+package org.fairdatatrain.trainhandler.service.job.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.JobEvent;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 import org.fairdatatrain.trainhandler.data.repository.JobEventRepository;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
+import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
-import org.fairdatatrain.trainhandler.service.async.JobEventNotificationListener;
+import org.fairdatatrain.trainhandler.service.job.JobService;
+import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +54,11 @@ public class JobEventService {
 
     public static final String ENTITY_NAME = "JobEvent";
 
+    private final RunRepository runRepository;
+
     private final JobRepository jobRepository;
+
+    private final RunService runService;
 
     private final JobService jobService;
 
@@ -59,8 +67,6 @@ public class JobEventService {
     private final JobEventMapper jobEventMapper;
 
     private final AsyncEventPublisher asyncEventPublisher;
-
-    private final JobEventNotificationListener jobEventNotificationListener;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -73,10 +79,9 @@ public class JobEventService {
 
     public List<JobEventDTO> getEvents(UUID runUuid, UUID jobUuid) throws NotFoundException {
         final Job job = jobService.getByIdOrThrow(jobUuid);
-        /*
-        if (job.getRun().getUuid() != runUuid) {
+        if (!job.getRun().getUuid().equals(runUuid)) {
             throw new NotFoundException(JobService.ENTITY_NAME, jobUuid);
-        }*/
+        }
         return jobEventRepository
                 .findAllByJobOrderByOccurredAtAsc(job)
                 .parallelStream()
@@ -84,62 +89,72 @@ public class JobEventService {
                 .toList();
     }
 
-    private List<JobEventDTO> getEventsAfter(
-            UUID runUuid, UUID jobUuid, UUID afterEventUuid
-    ) throws NotFoundException {
-        if (afterEventUuid == null) {
-            return getEvents(runUuid, jobUuid);
-        }
-        final JobEvent event = getByIdOrThrow(afterEventUuid);
-        return jobEventRepository
-                .findAllByJobAndOccurredAtAfterOrderByOccurredAtAsc(
-                        event.getJob(), event.getOccurredAt()
-                )
-                .parallelStream()
-                .map(jobEventMapper::toDTO)
-                .toList();
-    }
-
-    @Transactional
-    public List<JobEventDTO> pollEvents(
-            UUID runUuid, UUID jobUuid, UUID afterEventUuid
-    ) throws NotFoundException, InterruptedException {
-        List<JobEventDTO> events = getEventsAfter(runUuid, jobUuid, afterEventUuid);
-        if (events.isEmpty()) {
-            log.info("No events at this point");
-            log.info("Starting to wait");
-            jobEventNotificationListener.wait(jobUuid);
-            log.info("Finished to wait");
-            entityManager.flush();
-            events = getEventsAfter(runUuid, jobUuid, afterEventUuid);
-        }
-        return events;
-    }
-
     @Transactional
     public JobEventDTO createEvent(
             UUID runUuid, UUID jobUuid, JobEventCreateDTO reqDto
     ) throws NotFoundException, JobSecurityException {
         final Job job = jobService.getByIdOrThrow(jobUuid);
+        if (!job.getRun().getUuid().equals(runUuid)) {
+            throw new NotFoundException(JobService.ENTITY_NAME, jobUuid);
+        }
         if (!Objects.equals(job.getSecret(), reqDto.getSecret())) {
             throw new JobSecurityException("Incorrect secret for creating job event");
         }
         if (job.getRemoteId() == null) {
             job.setRemoteId(reqDto.getRemoteId());
+            job.getRun().setStatus(getNextRunStatus(job, reqDto));
             jobRepository.save(job);
         }
         else if (!Objects.equals(job.getRemoteId(), reqDto.getRemoteId())) {
             throw new JobSecurityException("Incorrect remote ID for creating job event");
         }
+        if (reqDto.getResultStatus() != null) {
+            job.setStatus(reqDto.getResultStatus());
+
+        }
         final JobEvent jobEvent = jobEventRepository.save(
                 jobEventMapper.fromCreateDTO(reqDto, job)
         );
+        job.setVersion(jobEvent.getUpdatedAt().toInstant().toEpochMilli());
+        jobRepository.save(job);
+        job.getRun().setVersion(job.getVersion());
+        runRepository.save(job.getRun());
         entityManager.flush();
         entityManager.refresh(jobEvent);
         return jobEventMapper.toDTO(jobEvent);
     }
 
-    public void notify(UUID jobUuid) {
-        asyncEventPublisher.publishNewJobEventNotification(jobUuid);
+    @Transactional
+    public void notify(UUID jobUuid, UUID runUuid) throws NotFoundException {
+        final RunDTO run = runService.getSingle(runUuid);
+        final JobDTO job = jobService.getSingle(runUuid, jobUuid);
+        asyncEventPublisher.publishNewJobEventNotification(run, job);
+    }
+
+    private RunStatus getNextRunStatus(Job job, JobEventCreateDTO reqDto) {
+        final List<JobStatus> jobStatuses = job.getRun().getJobs().stream().map(job1 -> {
+            if (job1.getUuid() == job.getUuid()) {
+                return reqDto.getResultStatus();
+            }
+            else {
+                return job.getStatus();
+            }
+        }).toList();
+        if (jobStatuses.stream().anyMatch(JobStatus.RUNNING::equals)) {
+            return RunStatus.RUNNING;
+        }
+        if (jobStatuses.stream().anyMatch(JobStatus.ABORTING::equals)) {
+            return RunStatus.ABORTING;
+        }
+        if (jobStatuses.stream().allMatch(JobStatus.ERRORED::equals)) {
+            return RunStatus.ERRORED;
+        }
+        if (jobStatuses.stream().allMatch(JobStatus.FINISHED::equals)) {
+            return RunStatus.FINISHED;
+        }
+        if (jobStatuses.stream().anyMatch(JobStatus.FAILED::equals)) {
+            return RunStatus.FAILED;
+        }
+        return job.getRun().getStatus();
     }
 }

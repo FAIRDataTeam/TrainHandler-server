@@ -20,22 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.async;
+package org.fairdatatrain.trainhandler.service.dispatch;
 
-import org.springframework.context.ApplicationEvent;
+import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-public class JobEventNotification extends ApplicationEvent {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class DispatchPayload {
 
-    private final UUID jobUuid;
+    @NotNull
+    private UUID jobUuid;
 
-    JobEventNotification(Object source, UUID jobUuid) {
-        super(source);
-        this.jobUuid = jobUuid;
-    }
+    @NotNull
+    private String secret;
 
-    public UUID getJobUuid() {
-        return jobUuid;
-    }
+    @NotNull
+    private String callbackEventLocation;
+
+    @NotNull
+    private String callbackArtifactLocation;
+
+    @NotNull
+    private String trainUri;
 }

@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.job;
+package org.fairdatatrain.trainhandler.service.job.event;
 
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobEventDTO;
@@ -29,8 +29,9 @@ import org.fairdatatrain.trainhandler.data.model.JobEvent;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
+
+import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
 @Component
 public class JobEventMapper {
@@ -38,24 +39,21 @@ public class JobEventMapper {
         return JobEventDTO
                 .builder()
                 .uuid(jobEvent.getUuid())
-                .type(jobEvent.getType())
                 .message(jobEvent.getMessage())
-                .payload(jobEvent.getPayload())
                 .resultStatus(jobEvent.getResultStatus())
                 .createdAt(jobEvent.getCreatedAt().toInstant())
+                .updatedAt(jobEvent.getUpdatedAt().toInstant())
                 .occurredAt(jobEvent.getOccurredAt().toInstant())
                 .build();
     }
 
     public JobEvent fromCreateDTO(JobEventCreateDTO reqDto, Job job) {
-        final Timestamp now = Timestamp.from(Instant.now());
+        final Timestamp now = now();
         return JobEvent
                 .builder()
                 .uuid(UUID.randomUUID())
                 .message(reqDto.getMessage())
-                .payload(reqDto.getPayload())
                 .resultStatus(reqDto.getResultStatus())
-                .type(reqDto.getType())
                 .occurredAt(Timestamp.from(reqDto.getOccurredAt()))
                 .job(job)
                 .createdAt(now)

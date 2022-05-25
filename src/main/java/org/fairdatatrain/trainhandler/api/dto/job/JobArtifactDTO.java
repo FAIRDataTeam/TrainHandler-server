@@ -23,12 +23,8 @@
 package org.fairdatatrain.trainhandler.api.dto.job;
 
 import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -36,29 +32,21 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class JobDTO {
+public class JobArtifactDTO {
 
     private UUID uuid;
 
-    private String remoteId;
+    private String displayName;
 
-    private JobStatus status;
+    private String filename;
 
-    private Instant startedAt;
+    private Long bytesize;
 
-    private Instant finishedAt;
+    private String hash;
 
-    private StationSimpleDTO target;
-
-    private RunSimpleDTO run;
-
-    private List<JobEventDTO> events;
-
-    private List<JobArtifactDTO> artifacts;
+    private Instant occurredAt;
 
     private Instant createdAt;
 
     private Instant updatedAt;
-
-    private Long version;
 }

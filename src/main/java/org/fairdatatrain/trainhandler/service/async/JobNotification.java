@@ -20,10 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.model.enums;
+package org.fairdatatrain.trainhandler.service.async;
 
-public enum JobEventType {
-    ARTEFACT,
-    INIT,
-    INFO
+import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
+import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
+import org.springframework.context.ApplicationEvent;
+
+public class JobNotification extends ApplicationEvent {
+
+    private final RunDTO run;
+
+    private final JobDTO job;
+
+    JobNotification(Object source, RunDTO run, JobDTO job) {
+        super(source);
+        this.run = run;
+        this.job = job;
+    }
+
+    public RunDTO getRun() {
+        return run;
+    }
+
+    public JobDTO getJob() {
+        return job;
+    }
 }

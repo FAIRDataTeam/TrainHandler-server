@@ -67,11 +67,14 @@ public class Run extends BaseEntity {
     @Column(name = "finished_at")
     private Timestamp finishedAt;
 
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "run")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "run")
     private List<Job> jobs;
 }

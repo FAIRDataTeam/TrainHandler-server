@@ -27,6 +27,7 @@ import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -48,5 +49,9 @@ public class JobSimpleDTO {
 
     private StationSimpleDTO target;
 
+    private List<JobArtifactDTO> artifacts;
+
     private UUID runUuid;
+
+    private Long version;
 }

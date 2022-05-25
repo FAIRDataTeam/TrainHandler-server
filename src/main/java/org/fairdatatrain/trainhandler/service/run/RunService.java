@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.service.run;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
@@ -33,23 +34,28 @@ import org.fairdatatrain.trainhandler.data.model.Run;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
+import org.fairdatatrain.trainhandler.service.async.RunNotificationListener;
 import org.fairdatatrain.trainhandler.service.job.JobMapper;
 import org.fairdatatrain.trainhandler.service.plan.PlanService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RunService {
 
-    private static final String ENTITY_NAME = "Run";
+    public static final String ENTITY_NAME = "Run";
 
     private final RunRepository runRepository;
 
@@ -60,6 +66,10 @@ public class RunService {
     private final JobMapper jobMapper;
 
     private final JobRepository jobRepository;
+
+    private final RunDispatcher runDispatcher;
+
+    private final RunNotificationListener runNotificationListener;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -91,7 +101,8 @@ public class RunService {
         jobRepository.saveAll(jobs);
         entityManager.flush();
         entityManager.refresh(newRun);
-        // TODO: schedule the run / dispatch it in async
+        newRun.getJobs().forEach(entityManager::refresh);
+        runDispatcher.dispatchNewRun(newRun);
         return runMapper.toDTO(newRun);
     }
 
@@ -101,5 +112,21 @@ public class RunService {
         final Run run = getByIdOrThrow(uuid);
         final Run updatedRun = runRepository.save(runMapper.fromUpdateDTO(reqDto, run));
         return runMapper.toDTO(updatedRun);
+    }
+
+    @Transactional
+    public void poll(
+            UUID runUuid,
+            DeferredResult<RunDTO> result,
+            Long version,
+            RunDTO currentRun
+    ) {
+        log.info(format("REQUESTED VERSION: %s", version));
+        log.info(format("CURRENT VERSION: %s", currentRun.getVersion()));
+        if (version < currentRun.getVersion()) {
+            result.setResult(currentRun);
+        }
+        log.info("No run update at this point, enqueueing...");
+        runNotificationListener.enqueue(runUuid, version, result);
     }
 }

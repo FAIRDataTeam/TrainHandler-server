@@ -20,42 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.async;
+package org.fairdatatrain.trainhandler.api.dto.job;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
-import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import static java.lang.String.format;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
-@Component
 @AllArgsConstructor
-@Slf4j
-public class AsyncEventPublisher {
+@NoArgsConstructor
+@Getter
+@Setter
+public class JobArtifactCreateDTO {
 
-    private final ApplicationEventPublisher publisher;
+    @NotNull
+    private String displayName;
 
-    public void publishNewJobEventNotification(final RunDTO run, final JobDTO job) {
-        log.info(
-                format(
-                        "Publishing new job notification for job %s (run %s)",
-                        job.getUuid(), run.getUuid()
-                )
-        );
-        publisher.publishEvent(new JobNotification(this, run, job));
-    }
+    @NotNull
+    private String filename;
 
-    public void publishNewJobEventNotification(final RunDTO run) {
-        log.info(
-                format(
-                        "Publishing new run notification for run %s",
-                        run.getUuid()
-                )
-        );
-        publisher.publishEvent(new JobNotification(this, run, null));
-    }
+    @NotNull
+    private String hash;
 
+    @NotNull
+    private Long bytesize;
+
+    @NotNull
+    private String contentType;
+
+    @NotNull
+    private Instant occurredAt;
+
+    @NotNull
+    private String remoteId;
+
+    @NotNull
+    private String secret;
+
+    @NotNull
+    private String base64data;
 }

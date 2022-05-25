@@ -61,6 +61,9 @@ public class Job extends BaseEntity {
     @Column(name = "finished_at")
     private Timestamp finishedAt;
 
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "plan_target_id")
@@ -68,9 +71,12 @@ public class Job extends BaseEntity {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "run_id")
+    @JoinColumn(name = "run_id", nullable = false)
     private Run run;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "job")
     private List<JobEvent> events;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "job")
+    private List<JobArtifact> artifacts;
 }

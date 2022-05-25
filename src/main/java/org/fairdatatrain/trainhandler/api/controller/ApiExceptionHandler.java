@@ -31,6 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.validation.ValidationException;
+
 import static java.lang.String.format;
 
 @ControllerAdvice
@@ -50,20 +52,37 @@ public class ApiExceptionHandler {
                         "HTTP-404",
                         format(
                                 "Cannot find entity %s with %s",
-                                exception.getEntityName(), exception.getFields())),
-                HttpStatus.NOT_FOUND);
+                                exception.getEntityName(), exception.getFields()
+                        )
+                ),
+                HttpStatus.NOT_FOUND
+        );
     }
 
     @ExceptionHandler(CannotPerformException.class)
     public ResponseEntity<ErrorDTO> handleCannotDeleteException(CannotPerformException exception) {
         return new ResponseEntity<>(
                 new ErrorDTO(
-                        "HTTP-400",
+                        "HTTP-400-DeletionError",
                         format(
                                 "Cannot perform %s on entity %s (with %s)",
                                 exception.getOperation(),
                                 exception.getEntityName(),
-                                exception.getFields())),
-                HttpStatus.BAD_REQUEST);
+                                exception.getFields()
+                        )
+                ),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorDTO> handleValidationException(ValidationException exception) {
+        return new ResponseEntity<>(
+                new ErrorDTO(
+                        "HTTP-400-ValidationError",
+                        exception.getMessage()
+                ),
+                HttpStatus.BAD_REQUEST
+        );
     }
 }

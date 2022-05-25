@@ -23,7 +23,6 @@
 package org.fairdatatrain.trainhandler.api.dto.job;
 
 import lombok.*;
-import org.fairdatatrain.trainhandler.data.model.enums.JobEventType;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import java.time.Instant;
@@ -38,13 +37,9 @@ public class JobEventDTO {
 
     private UUID uuid;
 
-    private JobEventType type;
-
     private JobStatus resultStatus;
 
     private String message;
-
-    private String payload;
 
     private Instant occurredAt;
 

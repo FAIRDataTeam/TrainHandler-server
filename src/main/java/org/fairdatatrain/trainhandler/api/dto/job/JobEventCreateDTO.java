@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.fairdatatrain.trainhandler.data.model.enums.JobEventType;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import javax.validation.constraints.NotNull;
@@ -38,15 +37,10 @@ import java.time.Instant;
 @Setter
 public class JobEventCreateDTO {
 
-    @NotNull
-    private JobEventType type;
-
     private JobStatus resultStatus;
 
     @NotNull
     private String message;
-
-    private String payload;
 
     @NotNull
     private Instant occurredAt;

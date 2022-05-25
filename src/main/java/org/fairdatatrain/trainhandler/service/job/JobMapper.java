@@ -24,10 +24,10 @@ package org.fairdatatrain.trainhandler.service.job;
 
 import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
 import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.PlanTarget;
-import org.fairdatatrain.trainhandler.data.model.Run;
+import org.fairdatatrain.trainhandler.data.model.*;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
+import org.fairdatatrain.trainhandler.service.job.artifact.JobArtifactMapper;
+import org.fairdatatrain.trainhandler.service.job.event.JobEventMapper;
 import org.fairdatatrain.trainhandler.service.run.RunMapper;
 import org.fairdatatrain.trainhandler.service.station.StationMapper;
 import org.springframework.context.annotation.Lazy;
@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.fairdatatrain.trainhandler.utils.RandomUtils.randomSecret;
-import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
 @Component
 public class JobMapper {
@@ -47,9 +46,20 @@ public class JobMapper {
 
     private final RunMapper runMapper;
 
-    public JobMapper(StationMapper stationMapper, @Lazy RunMapper runMapper) {
+    private final JobEventMapper jobEventMapper;
+
+    private final JobArtifactMapper jobArtifactMapper;
+
+    public JobMapper(
+            StationMapper stationMapper,
+            JobEventMapper jobEventMapper,
+            JobArtifactMapper jobArtifactMapper,
+            @Lazy RunMapper runMapper
+    ) {
         this.stationMapper = stationMapper;
         this.runMapper = runMapper;
+        this.jobEventMapper = jobEventMapper;
+        this.jobArtifactMapper = jobArtifactMapper;
     }
 
     public JobSimpleDTO toSimpleDTO(Job job) {
@@ -66,7 +76,9 @@ public class JobMapper {
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
+                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .runUuid(job.getRun().getUuid())
+                .version(job.getVersion())
                 .build();
     }
 
@@ -85,21 +97,24 @@ public class JobMapper {
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .run(runMapper.toSimpleDTO(job.getRun()))
+                .events(job.getEvents().stream().map(jobEventMapper::toDTO).toList())
+                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
                 .createdAt(job.getCreatedAt().toInstant())
                 .updatedAt(job.getUpdatedAt().toInstant())
+                .version(job.getVersion())
                 .build();
     }
 
     public Job fromTarget(Run run, PlanTarget target) {
-        final Timestamp now = now();
         return Job.builder()
                 .uuid(UUID.randomUUID())
                 .status(JobStatus.PREPARED)
                 .target(target)
                 .run(run)
                 .secret(randomSecret())
-                .createdAt(now)
-                .updatedAt(now)
+                .createdAt(run.getCreatedAt())
+                .updatedAt(run.getCreatedAt())
+                .version(run.getVersion())
                 .build();
     }
 }

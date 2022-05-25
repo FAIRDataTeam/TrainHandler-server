@@ -20,40 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.async;
+package org.fairdatatrain.trainhandler.utils;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+public class HashUtils {
+    private static final int MASK = 0xff;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-@Component
-public class JobEventNotificationListener {
-
-    private final Map<UUID, Object> locks = new HashMap<>();
-
-    @EventListener
-    public void handleJobEventNotification(JobEventNotification notification) {
-        if (locks.containsKey(notification.getJobUuid())) {
-            synchronized (locks.get(notification.getJobUuid())) {
-                final Object lock = locks.remove(notification.getJobUuid());
-                lock.notifyAll();
+    public static String bytesToHex(byte[] hash) {
+        final StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            final String hex = Integer.toHexString(MASK & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
             }
+            hexString.append(hex);
         }
-    }
-
-    private void prepare(UUID jobUuid) {
-        if (!locks.containsKey(jobUuid)) {
-            locks.put(jobUuid, new Object());
-        }
-    }
-
-    public void wait(UUID jobUuid) throws InterruptedException {
-        prepare(jobUuid);
-        synchronized (locks.get(jobUuid)) {
-            locks.get(jobUuid).wait();
-        }
+        return hexString.toString();
     }
 }

@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.service.run;
 
 import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.api.dto.job.JobSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunSimpleDTO;
@@ -35,6 +36,7 @@ import org.fairdatatrain.trainhandler.service.plan.PlanMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,13 +76,17 @@ public class RunMapper {
     }
 
     public RunDTO toDTO(Run run) {
+        final List<JobSimpleDTO> jobs = run.getJobs().stream()
+                .map(jobMapper::toSimpleDTO)
+                .toList();
         return RunDTO.builder()
                 .uuid(run.getUuid())
                 .displayName(run.getDisplayName())
                 .note(run.getNote())
                 .status(run.getStatus())
                 .plan(planMapper.toSimpleDTO(run.getPlan()))
-                .jobs(run.getJobs().stream().map(jobMapper::toSimpleDTO).toList())
+                .jobs(jobs)
+                .version(run.getVersion())
                 .shouldStartAt(
                         Optional.ofNullable(run.getShouldStartAt())
                                 .map(Timestamp::toInstant)
@@ -100,11 +106,14 @@ public class RunMapper {
 
     public Run fromCreateDTO(RunCreateDTO reqDto, Plan plan) {
         final Timestamp now = now();
+        final Long version = now.toInstant().toEpochMilli();
         return Run.builder()
                 .uuid(UUID.randomUUID())
                 .displayName(reqDto.getDisplayName())
                 .note(reqDto.getNote())
-                .status(RunStatus.PREPARED)
+                .status(reqDto.getShouldStartAt() == null
+                        ? RunStatus.PREPARED
+                        : RunStatus.SCHEDULED)
                 .plan(plan)
                 .shouldStartAt(
                         Optional.ofNullable(reqDto.getShouldStartAt())
@@ -114,14 +123,17 @@ public class RunMapper {
                 .finishedAt(null)
                 .createdAt(now)
                 .updatedAt(now)
+                .version(version)
                 .build();
     }
 
     public Run fromUpdateDTO(RunUpdateDTO reqDto, Run run) {
         final Timestamp now = now();
+        final Long version = now.toInstant().toEpochMilli();
         run.setDisplayName(reqDto.getDisplayName());
         run.setNote(reqDto.getNote());
         run.setUpdatedAt(now);
+        run.setVersion(version);
         return run;
     }
 }

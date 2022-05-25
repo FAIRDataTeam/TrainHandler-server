@@ -26,12 +26,26 @@ import org.fairdatatrain.trainhandler.data.model.Run;
 import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface RunRepository extends BaseRepository<Run> {
 
     Page<Run> findAllByPlanUuid(UUID planUuid, Pageable pageable);
+
+    @Query("""
+        SELECT r
+        FROM Run r
+        WHERE r.status = 'SCHEDULED'
+            AND r.shouldStartAt IS NOT NULL
+            AND r.shouldStartAt < :timestamp
+        ORDER BY r.shouldStartAt ASC
+        """)
+    Optional<Run> findRunToDispatch(@Param("timestamp") Timestamp timestamp);
 }
