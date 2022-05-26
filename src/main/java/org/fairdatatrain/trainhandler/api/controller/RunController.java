@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunUpdateDTO;
+import org.fairdatatrain.trainhandler.config.DispatcherConfig;
 import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
@@ -49,7 +50,7 @@ public class RunController {
 
     private final AsyncEventPublisher asyncEventPublisher;
 
-    private final Long pollTimeout;
+    private final DispatcherConfig dispatcherConfig;
 
     @PostMapping(
             path = "",
@@ -71,7 +72,7 @@ public class RunController {
     ) throws NotFoundException {
         final RunDTO currentRun = runService.getSingle(uuid);
         final DeferredResult<RunDTO> result = new DeferredResult<>(
-                pollTimeout, currentRun
+                dispatcherConfig.getPolling().getTimeoutMs(), currentRun
         );
         runService.poll(uuid, result, after, currentRun);
         return result;

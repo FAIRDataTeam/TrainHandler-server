@@ -20,21 +20,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.config;
+package org.fairdatatrain.trainhandler.config.properties;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Configuration
-public class AsyncConfig {
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-    // TODO: custom config properties
-    @Value("${poll.timeout:10000}")
-    private final Long pollTimeout = 10000L;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class PollingProperties {
 
-    @Bean("pollTimeout")
-    public Long getPollTimeout() {
-        return pollTimeout;
+    private Duration timeout = Duration.parse("PT50S");
+
+    public long getTimeoutMs() {
+        return timeout.toMillis();
+    }
+
+    public Instant getTimeoutForCurrentPoll() {
+        return Instant.now().plus(getTimeoutMs(), ChronoUnit.MILLIS);
     }
 }

@@ -25,6 +25,7 @@ package org.fairdatatrain.trainhandler.api.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.job.*;
+import org.fairdatatrain.trainhandler.config.DispatcherConfig;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.job.JobService;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class JobController {
 
     private final JobService jobService;
 
-    private final Long pollTimeout;
+    private final DispatcherConfig config;
 
     @GetMapping(path = "/{runUuid}/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<JobSimpleDTO> getJobs(@PathVariable UUID runUuid, Pageable pageable) {
@@ -61,7 +62,7 @@ public class JobController {
     ) throws NotFoundException {
         final JobDTO currentJob = jobService.getSingle(runUuid, jobUuid);
         final DeferredResult<JobDTO> result = new DeferredResult<>(
-                pollTimeout, currentJob
+                config.getPolling().getTimeoutMs(), currentJob
         );
         jobService.poll(jobUuid, result, after, currentJob);
         return result;

@@ -65,8 +65,8 @@ public class RunDispatcher {
     }
 
     @Scheduled(
-            initialDelayString = "${dispatch.initDelay:PT1M}",
-            fixedRateString = "${dispatch.interval:PT1M}"
+            initialDelayString = "${dispatcher.dispatch.initDelay:PT1M}",
+            fixedRateString = "${dispatcher.dispatch.interval:PT1M}"
     )
     public void dispatchScheduledRuns() {
         log.info("Dispatching scheduled runs");

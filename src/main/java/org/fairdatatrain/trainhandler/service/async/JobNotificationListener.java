@@ -26,12 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
+import org.fairdatatrain.trainhandler.config.DispatcherConfig;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -41,7 +41,7 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class JobNotificationListener {
 
-    private final Long pollTimeout;
+    private final DispatcherConfig config;
 
     private final Map<UUID, List<PollContainer<JobDTO>>> queues = new HashMap<>();
 
@@ -100,7 +100,7 @@ public class JobNotificationListener {
         queues.get(jobUuid).add(
                 new PollContainer<>(
                         version,
-                        Instant.now().plus(pollTimeout, ChronoUnit.MILLIS),
+                        config.getPolling().getTimeoutForCurrentPoll(),
                         result
                 )
         );
