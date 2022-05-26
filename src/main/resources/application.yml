@@ -7,6 +7,8 @@ dispatcher:
     interval: PT1M
 
 spring:
+  main:
+    banner-mode: off
   datasource:
     url: jdbc:postgresql://postgres/train-handler
     username: train-handler

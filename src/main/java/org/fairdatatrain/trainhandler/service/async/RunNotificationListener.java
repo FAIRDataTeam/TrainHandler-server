@@ -47,6 +47,7 @@ public class RunNotificationListener {
 
     @EventListener
     public void handleJobEventNotification(JobNotification notification) {
+        log.debug("Handling new run notification");
         updateResults(notification.getRun());
     }
 
@@ -58,7 +59,7 @@ public class RunNotificationListener {
         );
         final Instant now = Instant.now();
         if (queues.containsKey(run.getUuid())) {
-            final List<PollContainer<RunDTO>> remainings = new ArrayList<>();
+            final List<PollContainer<RunDTO>> remaining = new ArrayList<>();
             queues.get(run.getUuid())
                     .stream()
                     .filter(container -> container.getTimeoutsAt().isAfter(now))
@@ -69,31 +70,45 @@ public class RunNotificationListener {
                             container.getResult().setResult(run);
                         }
                         else {
-                            remainings.add(container);
+                            remaining.add(container);
                         }
                     });
-            queues.put(run.getUuid(), remainings);
+            log.debug(format(
+                    "Run %s queue size before %s and after %s",
+                    run.getUuid(), queues.get(run.getUuid()).size(), remaining.size()
+            ));
+            queues.put(run.getUuid(), remaining);
         }
         log.info(format(
                 "Updating results for run '%s' (version '%s'): done",
-                run.getUuid(), run.getVersion())
-        );
+                run.getUuid(), run.getVersion()
+        ));
     }
 
     @Synchronized
     public void enqueue(UUID runUuid, Long version, DeferredResult<RunDTO> result) {
+        log.info(format(
+                "Enqueueing deferred result for run '%s' (version '%s')",
+                runUuid, version
+        ));
         final Instant now = Instant.now();
         if (!queues.containsKey(runUuid)) {
+            log.debug("Initializing new run queue");
             queues.put(runUuid, new ArrayList<>());
         }
         else {
-            final List<PollContainer<RunDTO>> remainings = new ArrayList<>();
+            log.debug("Cleaning up existing job queue");
+            final List<PollContainer<RunDTO>> remaining = new ArrayList<>();
             queues.get(runUuid).forEach(container -> {
                 if (container.getTimeoutsAt().isAfter(now)) {
-                    remainings.add(container);
+                    remaining.add(container);
                 }
             });
-            queues.put(runUuid, remainings);
+            log.debug(format(
+                    "Existing run queue size before %s and after %s",
+                    queues.get(runUuid).size(), remaining.size()
+            ));
+            queues.put(runUuid, remaining);
         }
         queues.get(runUuid).add(
                 new PollContainer<>(
@@ -102,6 +117,10 @@ public class RunNotificationListener {
                         result
                 )
         );
+        log.debug(format(
+                "Enqueueing deferred result for run '%s' (version '%s'): done",
+                runUuid, version
+        ));
     }
 
 }

@@ -60,7 +60,7 @@ public class DispatchService {
         final HttpEntity<String> entity = new HttpEntity<>(payloadJson, headers);
         final ResponseEntity<String> response = client.postForEntity(uri, entity, String.class);
         if (!response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
-            log.info(format(
+            log.warn(format(
                     "Dispatching job %s failed: %s", job.getUuid(), response.getStatusCode()
             ));
             throw new RuntimeException(

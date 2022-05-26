@@ -140,7 +140,7 @@ public class JobArtifactService {
     }
 
     private void validate(JobArtifactCreateDTO reqDto, byte[] data) {
-        MessageDigest digest = null;
+        final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
         }

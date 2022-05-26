@@ -39,22 +39,18 @@ public class AsyncEventPublisher {
     private final ApplicationEventPublisher publisher;
 
     public void publishNewJobEventNotification(final RunDTO run, final JobDTO job) {
-        log.info(
-                format(
-                        "Publishing new job notification for job %s (run %s)",
-                        job.getUuid(), run.getUuid()
-                )
-        );
+        log.info(format(
+                "Publishing new job notification for job %s (run %s)",
+                job.getUuid(), run.getUuid()
+        ));
         publisher.publishEvent(new JobNotification(this, run, job));
     }
 
     public void publishNewJobEventNotification(final RunDTO run) {
-        log.info(
-                format(
-                        "Publishing new run notification for run %s",
-                        run.getUuid()
-                )
-        );
+        log.info(format(
+                "Publishing new run notification for run %s",
+                run.getUuid()
+        ));
         publisher.publishEvent(new JobNotification(this, run, null));
     }
 

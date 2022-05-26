@@ -48,6 +48,7 @@ public class JobNotificationListener {
     @EventListener
     public void handleJobEventNotification(JobNotification notification) {
         if (notification.getJob() != null) {
+            log.debug("Handling new job notification");
             updateResults(notification.getJob());
         }
     }
@@ -55,12 +56,12 @@ public class JobNotificationListener {
     @Synchronized
     public void updateResults(JobDTO job) {
         log.info(format(
-                "Updating results for job '%s' (version '%s')",
+                "Updating results for job '%s' (version '%s'): start",
                 job.getUuid(), job.getVersion()
         ));
         final Instant now = Instant.now();
         if (queues.containsKey(job.getUuid())) {
-            final List<PollContainer<JobDTO>> remainings = new ArrayList<>();
+            final List<PollContainer<JobDTO>> remaining = new ArrayList<>();
             queues.get(job.getUuid())
                     .stream()
                     .filter(container -> container.getTimeoutsAt().isAfter(now))
@@ -71,31 +72,45 @@ public class JobNotificationListener {
                             container.getResult().setResult(job);
                         }
                         else {
-                            remainings.add(container);
+                            remaining.add(container);
                         }
                     });
-            queues.put(job.getUuid(), remainings);
+            log.debug(format(
+                    "Job %s queue size before %s and after %s",
+                    job.getUuid(), queues.get(job.getUuid()).size(), remaining.size()
+            ));
+            queues.put(job.getUuid(), remaining);
         }
         log.info(format(
                 "Updating results for job '%s' (version '%s'): done",
-                job.getUuid(), job.getVersion())
-        );
+                job.getUuid(), job.getVersion()
+        ));
     }
 
     @Synchronized
     public void enqueue(UUID jobUuid, Long version, DeferredResult<JobDTO> result) {
+        log.info(format(
+                "Enqueueing deferred result for job '%s' (version '%s')",
+                jobUuid, version
+        ));
         final Instant now = Instant.now();
         if (!queues.containsKey(jobUuid)) {
+            log.debug("Initializing new job queue");
             queues.put(jobUuid, new ArrayList<>());
         }
         else {
-            final List<PollContainer<JobDTO>> remainings = new ArrayList<>();
+            log.debug("Cleaning up existing job queue");
+            final List<PollContainer<JobDTO>> remaining = new ArrayList<>();
             queues.get(jobUuid).forEach(container -> {
                 if (container.getTimeoutsAt().isAfter(now)) {
-                    remainings.add(container);
+                    remaining.add(container);
                 }
             });
-            queues.put(jobUuid, remainings);
+            log.debug(format(
+                    "Existing job queue size before %s and after %s",
+                    queues.get(jobUuid).size(), remaining.size()
+            ));
+            queues.put(jobUuid, remaining);
         }
         queues.get(jobUuid).add(
                 new PollContainer<>(
@@ -104,5 +119,9 @@ public class JobNotificationListener {
                         result
                 )
         );
+        log.debug(format(
+                "Enqueueing deferred result for job '%s' (version '%s'): done",
+                jobUuid, version
+        ));
     }
 }
