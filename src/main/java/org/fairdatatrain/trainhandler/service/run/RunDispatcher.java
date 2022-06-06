@@ -23,7 +23,9 @@
 package org.fairdatatrain.trainhandler.service.run;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fairdatatrain.trainhandler.api.dto.job.JobEventCreateDTO;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.Run;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
@@ -31,13 +33,15 @@ import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 import org.fairdatatrain.trainhandler.data.repository.JobRepository;
 import org.fairdatatrain.trainhandler.data.repository.RunRepository;
 import org.fairdatatrain.trainhandler.service.dispatch.DispatchService;
-import org.springframework.scheduling.annotation.Async;
+import org.fairdatatrain.trainhandler.service.job.event.JobEventService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -55,21 +59,14 @@ public class RunDispatcher {
 
     private final RunRepository runRepository;
 
-    @Async
-    @Transactional
-    public void dispatchNewRun(Run run) {
-        if (run.getShouldStartAt() != null || !run.getStatus().equals(RunStatus.PREPARED)) {
-            return;
-        }
-        dispatchRun(run);
-    }
+    private final JobEventService jobEventService;
 
     @Scheduled(
             initialDelayString = "${dispatcher.dispatch.initDelay:PT1M}",
             fixedRateString = "${dispatcher.dispatch.interval:PT1M}"
     )
     public void dispatchScheduledRuns() {
-        log.info("Dispatching scheduled runs");
+        log.debug("Dispatching scheduled runs");
         final Set<UUID> dispatchedRuns = new HashSet<>();
         boolean dispatching = true;
         while (dispatching) {
@@ -77,46 +74,69 @@ public class RunDispatcher {
             dispatching = dispatchedRun != null && !dispatchedRuns.contains(dispatchedRun);
             if (dispatching) {
                 dispatchedRuns.add(dispatchedRun);
-                log.info("Dispatched run: " + dispatchedRun);
+                log.debug("Dispatched run: " + dispatchedRun);
             }
             else {
-                log.info("No more runs to be dispatched now");
+                log.debug("No more runs to be dispatched now");
             }
         }
     }
 
-    @Transactional
     public UUID tryDispatchRun() {
-        final Optional<Run> optionalRun = runRepository.findRunToDispatch(now());
-        if (optionalRun.isEmpty()) {
+        final Page<Run> runs = runRepository.findRunToDispatch(
+                now(),
+                Pageable.ofSize(1).withPage(0)
+        );
+        if (runs.isEmpty()) {
             return null;
         }
-        final Run run = optionalRun.get();
+        final Run run = runs.getContent().get(0);
         log.info("Run selected for dispatching: " + run.getUuid());
         dispatchRun(run);
         return run.getUuid();
     }
 
-    private void dispatchRun(Run run) {
+    @Transactional
+    protected void dispatchRun(Run run) {
         run.setStartedAt(now());
-        run.getJobs().forEach(this::dispatchJob);
+        run.getJobs().forEach(job -> {
+            job.setStartedAt(now());
+            jobRepository.save(job);
+        });
         run.setStatus(RunStatus.RUNNING);
         runRepository.save(run);
+        run.getJobs().forEach(job -> dispatchJob(run.getUuid(), job));
     }
 
-    private void dispatchJob(Job job) {
-        job.setStartedAt(now());
+    @SneakyThrows
+    protected void dispatchJob(UUID runUuid, Job job) {
         try {
+            jobEventService.createEvent(
+                    runUuid,
+                    job.getUuid(),
+                    JobEventCreateDTO.builder()
+                            .message("Dispatching job from train handler")
+                            .occurredAt(Instant.now())
+                            .resultStatus(JobStatus.RUNNING)
+                            .secret(job.getSecret())
+                            .build()
+            );
+            jobEventService.notify(job.getUuid());
             dispatchService.dispatch(job);
-            job.setStatus(JobStatus.RUNNING);
         }
         catch (Exception ex) {
             log.warn(format("Failed to dispatch job %s: %s", job.getUuid(), ex.getMessage()));
-            // TODO add event (?)
-            job.setStatus(JobStatus.ERRORED);
-        }
-        finally {
-            jobRepository.save(job);
+            jobEventService.createEvent(
+                    runUuid,
+                    job.getUuid(),
+                    JobEventCreateDTO.builder()
+                            .message(format("Dispatch failed: %s", ex.getMessage()))
+                            .occurredAt(Instant.now())
+                            .resultStatus(JobStatus.ERRORED)
+                            .secret(job.getSecret())
+                            .build()
+            );
+            jobEventService.notify(job.getUuid());
         }
     }
 }

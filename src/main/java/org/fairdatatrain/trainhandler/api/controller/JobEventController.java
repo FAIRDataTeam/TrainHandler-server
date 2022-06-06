@@ -67,7 +67,7 @@ public class JobEventController {
             @RequestBody @Valid JobEventCreateDTO reqDto
     ) throws NotFoundException, JobSecurityException {
         final JobEventDTO dto = jobEventService.createEvent(runUuid, jobUuid, reqDto);
-        jobEventService.notify(jobUuid, runUuid);
+        jobEventService.notify(jobUuid);
         return dto;
     }
 }

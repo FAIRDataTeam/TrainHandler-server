@@ -22,10 +22,7 @@
  */
 package org.fairdatatrain.trainhandler.api.dto.job;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
 import javax.validation.constraints.NotNull;
@@ -35,6 +32,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class JobEventCreateDTO {
 
     private JobStatus resultStatus;

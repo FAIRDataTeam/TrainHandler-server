@@ -31,7 +31,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -42,10 +41,17 @@ public interface RunRepository extends BaseRepository<Run> {
     @Query("""
         SELECT r
         FROM Run r
-        WHERE r.status = 'SCHEDULED'
-            AND r.shouldStartAt IS NOT NULL
-            AND r.shouldStartAt < :timestamp
+        WHERE
+            (
+                r.status = 'SCHEDULED'
+                AND r.shouldStartAt IS NOT NULL
+                AND r.shouldStartAt < :timestamp
+            ) OR (
+                r.status = 'PREPARED'
+                AND r.startedAt IS NULL
+                AND r.shouldStartAt IS NULL
+            )
         ORDER BY r.shouldStartAt ASC
         """)
-    Optional<Run> findRunToDispatch(@Param("timestamp") Timestamp timestamp);
+    Page<Run> findRunToDispatch(@Param("timestamp") Timestamp timestamp, Pageable pageable);
 }

@@ -3,8 +3,8 @@ dispatcher:
     timeout: PT2M
   dispatch:
     root: http://localhost:8080
-    initDelay: PT1M
-    interval: PT1M
+    initDelay: PT30S
+    interval: PT30S
 
 spring:
   main:

@@ -99,7 +99,7 @@ public class JobArtifactController {
             @RequestBody @Valid JobArtifactCreateDTO reqDto
     ) throws NotFoundException, JobSecurityException {
         final JobArtifactDTO dto = jobArtifactService.createArtifact(runUuid, jobUuid, reqDto);
-        jobEventService.notify(jobUuid, runUuid);
+        jobEventService.notify(jobUuid);
         return dto;
     }
 }

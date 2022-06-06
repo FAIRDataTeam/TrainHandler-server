@@ -67,8 +67,6 @@ public class RunService {
 
     private final JobRepository jobRepository;
 
-    private final RunDispatcher runDispatcher;
-
     private final RunNotificationListener runNotificationListener;
 
     @PersistenceContext
@@ -102,7 +100,6 @@ public class RunService {
         entityManager.flush();
         entityManager.refresh(newRun);
         newRun.getJobs().forEach(entityManager::refresh);
-        runDispatcher.dispatchNewRun(newRun);
         return runMapper.toDTO(newRun);
     }
 
