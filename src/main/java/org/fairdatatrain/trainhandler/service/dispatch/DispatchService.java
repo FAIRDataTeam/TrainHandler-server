@@ -23,14 +23,14 @@
 package org.fairdatatrain.trainhandler.service.dispatch;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.data.model.Job;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import static java.lang.String.format;
 
@@ -41,9 +41,7 @@ public class DispatchService {
 
     private final DispatchMapper dispatchMapper;
 
-    private final RestTemplate client;
-
-    private final ObjectMapper objectMapper;
+    private final WebClient webClient;
 
     public void dispatch(Job job) throws JsonProcessingException {
         if (!job.getStatus().equals(JobStatus.PREPARED)) {
@@ -54,17 +52,21 @@ public class DispatchService {
         // TODO: what should be the response?
         final String uri = job.getTarget().getStation().getUri();
         log.info(format("Dispatching job %s by POST to %s", job.getUuid(), uri));
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        final String payloadJson = objectMapper.writeValueAsString(payload);
-        final HttpEntity<String> entity = new HttpEntity<>(payloadJson, headers);
-        final ResponseEntity<String> response = client.postForEntity(uri, entity, String.class);
-        if (!response.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+        try {
+            final String response = webClient
+                    .post()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(payload)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        }
+        catch (WebClientException exception) {
             log.warn(format(
-                    "Dispatching job %s failed: %s", job.getUuid(), response.getStatusCode()
+                    "Dispatching job %s failed: %s", job.getUuid(), exception.getMessage()
             ));
             throw new RuntimeException(
-                    "Station responded with status: " + response.getStatusCode()
+                    "Station responded with status: " + exception.getMessage()
             );
         }
         log.info(format("Dispatching job %s accepted", job.getUuid()));

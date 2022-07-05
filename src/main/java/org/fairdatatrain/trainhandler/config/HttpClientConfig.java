@@ -22,44 +22,26 @@
  */
 package org.fairdatatrain.trainhandler.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
-import java.net.http.HttpClient;
 import java.time.Duration;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Configuration
 public class HttpClientConfig {
     private static final long TIMEOUT = 5;
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder
-                .setConnectTimeout(Duration.ofSeconds(TIMEOUT))
-                .setReadTimeout(Duration.ofSeconds(TIMEOUT))
-                .build();
-    }
+    public WebClient webClient() {
+        final HttpClient client = HttpClient.create()
+                .followRedirect(true)
+                .responseTimeout(Duration.ofSeconds(TIMEOUT));
 
-    @Bean
-    public HttpClient httpClient() {
-        return HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .followRedirects(HttpClient.Redirect.ALWAYS)
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(client))
                 .build();
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        mapper.setSerializationInclusion(NON_NULL);
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        return mapper;
     }
 }
