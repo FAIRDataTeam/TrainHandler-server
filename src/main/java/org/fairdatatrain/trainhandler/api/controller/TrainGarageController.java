@@ -78,4 +78,10 @@ public class TrainGarageController {
     public void delete(@PathVariable UUID uuid) throws NotFoundException {
         trainGarageService.delete(uuid);
     }
+
+    @PutMapping(path = "/{uuid}/trains", params = "refresh")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public void refreshTrains(@PathVariable UUID uuid) throws NotFoundException {
+        trainGarageService.reindex(uuid);
+    }
 }
