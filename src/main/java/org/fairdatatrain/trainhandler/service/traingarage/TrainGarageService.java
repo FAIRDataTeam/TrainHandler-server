@@ -44,6 +44,8 @@ public class TrainGarageService {
 
     private final TrainGarageMapper trainGarageMapper;
 
+    private final TrainGarageIndexer trainGarageIndexer;
+
     private TrainGarage getByIdOrThrow(UUID uuid) throws NotFoundException {
         return trainGarageRepository
                 .findById(uuid)
@@ -73,7 +75,8 @@ public class TrainGarageService {
         // TODO: validate?
         final TrainGarage newTrainGarage =
                 trainGarageRepository.save(trainGarageMapper.fromCreateDTO(reqDto));
-        return this.trainGarageMapper.toDTO(newTrainGarage);
+        trainGarageIndexer.indexGarage(newTrainGarage);
+        return trainGarageMapper.toDTO(newTrainGarage);
     }
 
     public TrainGarageDTO update(UUID uuid, TrainGarageChangeDTO reqDto)
@@ -83,6 +86,7 @@ public class TrainGarageService {
         final TrainGarage updatedTrainGarage =
                 trainGarageRepository.save(
                         trainGarageMapper.fromUpdateDTO(reqDto, trainGarage));
-        return this.trainGarageMapper.toDTO(updatedTrainGarage);
+        trainGarageIndexer.indexGarage(updatedTrainGarage);
+        return trainGarageMapper.toDTO(updatedTrainGarage);
     }
 }

@@ -20,20 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.utils;
 
-import org.fairdatatrain.trainhandler.data.model.TrainType;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import org.eclipse.rdf4j.model.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Repository
-public interface TrainTypeRepository extends BaseRepository<TrainType> {
+import static org.fairdatatrain.trainhandler.utils.ValueFactoryUtils.i;
 
-    List<TrainType> findAllBy();
+public class RdfUtils {
 
-    Page<TrainType> findByTitleContainingIgnoreCase(String query, Pageable pageable);
+    public static List<Value> getObjectsBy(Model model, Resource subject, IRI predicate) {
+        return model
+                .filter(subject, predicate, null)
+                .stream()
+                .map(Statement::getObject)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Value> getObjectsBy(Model model, String subject, String predicate) {
+        return getObjectsBy(model, i(subject, model), i(predicate, model));
+    }
+
+    public static Value getObjectBy(Model model, Resource subject, IRI predicate) {
+        final List<Value> objects = getObjectsBy(model, subject, predicate);
+        return objects.size() > 0 ? objects.get(0) : null;
+    }
+
+    public static String getStringObjectBy(Model model, Resource subject, IRI predicate) {
+        final Value object = getObjectBy(model, subject, predicate);
+        return object != null ? object.stringValue() : null;
+    }
 }
