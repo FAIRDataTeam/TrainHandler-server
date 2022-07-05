@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.stationdirectory.StationDirectoryDTO;
 import org.fairdatatrain.trainhandler.data.model.StationDirectory;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 import org.fairdatatrain.trainhandler.data.repository.StationDirectoryRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,8 @@ public class StationDirectoryService {
     private final StationDirectoryRepository stationDirectoryRepository;
 
     private final StationDirectoryMapper stationDirectoryMapper;
+
+    private final StationDirectoryIndexer stationDirectoryIndexer;
 
     private StationDirectory getByIdOrThrow(UUID uuid) throws NotFoundException {
         return stationDirectoryRepository
@@ -73,6 +76,7 @@ public class StationDirectoryService {
         // TODO: validate?
         final StationDirectory newStationDirectory =
                 stationDirectoryRepository.save(stationDirectoryMapper.fromCreateDTO(reqDto));
+        stationDirectoryIndexer.indexDirectory(newStationDirectory);
         return this.stationDirectoryMapper.toDTO(newStationDirectory);
     }
 
@@ -83,6 +87,15 @@ public class StationDirectoryService {
         final StationDirectory updatedStationDirectory =
                 stationDirectoryRepository.save(
                         stationDirectoryMapper.fromUpdateDTO(reqDto, stationDirectory));
+        stationDirectoryIndexer.indexDirectory(updatedStationDirectory);
         return this.stationDirectoryMapper.toDTO(updatedStationDirectory);
+    }
+
+    public void reindex(UUID uuid) throws NotFoundException {
+        final StationDirectory stationDirectory = getByIdOrThrow(uuid);
+        stationDirectory.setStatus(SyncServiceStatus.SYNCING);
+        final StationDirectory updatedStationDirectory =
+                stationDirectoryRepository.save(stationDirectory);
+        stationDirectoryIndexer.indexDirectory(updatedStationDirectory);
     }
 }

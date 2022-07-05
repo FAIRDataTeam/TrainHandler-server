@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageDTO;
 import org.fairdatatrain.trainhandler.data.model.TrainGarage;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 import org.fairdatatrain.trainhandler.data.repository.TrainGarageRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,8 @@ public class TrainGarageService {
     private final TrainGarageRepository trainGarageRepository;
 
     private final TrainGarageMapper trainGarageMapper;
+
+    private final TrainGarageIndexer trainGarageIndexer;
 
     private TrainGarage getByIdOrThrow(UUID uuid) throws NotFoundException {
         return trainGarageRepository
@@ -73,7 +76,8 @@ public class TrainGarageService {
         // TODO: validate?
         final TrainGarage newTrainGarage =
                 trainGarageRepository.save(trainGarageMapper.fromCreateDTO(reqDto));
-        return this.trainGarageMapper.toDTO(newTrainGarage);
+        trainGarageIndexer.indexGarage(newTrainGarage);
+        return trainGarageMapper.toDTO(newTrainGarage);
     }
 
     public TrainGarageDTO update(UUID uuid, TrainGarageChangeDTO reqDto)
@@ -83,6 +87,15 @@ public class TrainGarageService {
         final TrainGarage updatedTrainGarage =
                 trainGarageRepository.save(
                         trainGarageMapper.fromUpdateDTO(reqDto, trainGarage));
-        return this.trainGarageMapper.toDTO(updatedTrainGarage);
+        trainGarageIndexer.indexGarage(updatedTrainGarage);
+        return trainGarageMapper.toDTO(updatedTrainGarage);
+    }
+
+    public void reindex(UUID uuid) throws NotFoundException {
+        final TrainGarage trainGarage = getByIdOrThrow(uuid);
+        trainGarage.setStatus(SyncServiceStatus.SYNCING);
+        final TrainGarage updatedTrainGarage =
+                trainGarageRepository.save(trainGarage);
+        trainGarageIndexer.indexGarage(updatedTrainGarage);
     }
 }

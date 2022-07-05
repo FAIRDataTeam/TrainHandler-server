@@ -34,6 +34,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "TrainGarage")
@@ -71,4 +72,11 @@ public class TrainGarage extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "garage")
     private List<Train> trains;
+
+    public List<Train> getTrains() {
+        if (trains == null) {
+            trains = new ArrayList<>();
+        }
+        return trains;
+    }
 }

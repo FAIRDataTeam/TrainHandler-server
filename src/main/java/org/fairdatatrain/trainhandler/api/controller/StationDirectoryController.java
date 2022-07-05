@@ -78,4 +78,10 @@ public class StationDirectoryController {
     public void delete(@PathVariable UUID uuid) throws NotFoundException {
         stationDirectoryService.delete(uuid);
     }
+
+    @PutMapping(path = "/{uuid}/stations", params = "refresh")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public void refreshStations(@PathVariable UUID uuid) throws NotFoundException {
+        stationDirectoryService.reindex(uuid);
+    }
 }

@@ -73,6 +73,7 @@ public class StationDirectoryMapper {
         stationDirectory.setUri(reqDto.getUri());
         stationDirectory.setDisplayName(reqDto.getDisplayName());
         stationDirectory.setNote(reqDto.getNote());
+        stationDirectory.setStatus(SyncServiceStatus.SYNCING);
         stationDirectory.setUpdatedAt(now);
         return stationDirectory;
     }

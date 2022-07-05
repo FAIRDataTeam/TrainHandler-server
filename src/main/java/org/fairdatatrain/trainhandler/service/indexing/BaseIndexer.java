@@ -20,56 +20,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.service.dispatch;
+package org.fairdatatrain.trainhandler.service.indexing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fairdatatrain.trainhandler.data.model.Job;
-import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
-import org.springframework.http.*;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.vocabulary.LDP;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 
+import java.net.URI;
+import java.util.List;
+
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static org.fairdatatrain.trainhandler.utils.RdfIOUtils.read;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DispatchService {
-
-    private final DispatchMapper dispatchMapper;
+public class BaseIndexer {
 
     private final WebClient webClient;
 
-    public void dispatch(Job job) throws JsonProcessingException {
-        if (!job.getStatus().equals(JobStatus.PREPARED)) {
-            throw new RuntimeException("Job not in state PREPARED, cannot dispatch");
-        }
-        final DispatchPayload payload = dispatchMapper.toPayload(job);
-        // TODO: should it POST directly to the station URI or some other endpoint?
-        // TODO: what should be the response?
-        final String uri = job.getTarget().getStation().getUri();
-        log.info(format("Dispatching job %s by POST to %s", job.getUuid(), uri));
+    public List<String> extractChildren(Model model) {
+        return model
+                .filter(null, LDP.CONTAINS, null)
+                .parallelStream()
+                .map(statement -> statement.getObject().stringValue())
+                .toList();
+    }
+
+    @SneakyThrows
+    public Model makeRequest(String uri) {
+        log.info(format("Making request to '%s'", uri));
         try {
             final String response = webClient
-                    .post()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(payload)
+                    .get()
+                    .uri(URI.create(uri))
+                    .accept(MediaType.parseMediaType(RDFFormat.TURTLE.getDefaultMIMEType()))
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
+            log.info(format("Request to '%s' successfully received", uri));
+            final Model result = read(response, uri, RDFFormat.TURTLE);
+            log.info(format("Request to '%s' successfully parsed", uri));
+            return result;
         }
         catch (WebClientException exception) {
-            log.warn(format(
-                    "Dispatching job %s failed: %s", job.getUuid(), exception.getMessage()
-            ));
-            throw new RuntimeException(
-                    "Station responded with status: " + exception.getMessage()
+            log.info(format("Request to '%s' failed", uri));
+            throw new HttpClientErrorException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ofNullable(exception.getMessage()).orElse("HTTP request failed")
             );
         }
-        log.info(format("Dispatching job %s accepted", job.getUuid()));
     }
-
 }
