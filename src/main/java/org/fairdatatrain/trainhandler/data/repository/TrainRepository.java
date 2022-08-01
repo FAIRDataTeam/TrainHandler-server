@@ -35,12 +35,17 @@ import java.util.List;
 @Repository
 public interface TrainRepository extends BaseRepository<Train> {
 
-    Page<Train> findByTitleContainingIgnoreCase(String query, Pageable pageable);
+    Page<Train> findAllBySoftDeletedIsFalse(Pageable pageable);
+
+    Page<Train> findByTitleContainingIgnoreCaseAndSoftDeletedIsFalse(
+            String query, Pageable pageable
+    );
 
     @Query("""
         SELECT t
         FROM Train t
         WHERE LOWER(t.title) LIKE %:query%
+            AND t.softDeleted IS FALSE
         ORDER BY t.title""")
     List<Train> findByTitleContainingIgnoreCase(@Param("query") String query);
 }

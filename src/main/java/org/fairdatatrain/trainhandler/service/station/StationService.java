@@ -25,6 +25,7 @@ package org.fairdatatrain.trainhandler.service.station;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.station.StationDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.station.StationUpdateDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainSimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.Station;
 import org.fairdatatrain.trainhandler.data.model.Train;
@@ -61,10 +62,12 @@ public class StationService {
 
     public Page<StationSimpleDTO> getPaged(String query, Pageable pageable) {
         if (query.isBlank()) {
-            return stationRepository.findAll(pageable).map(stationMapper::toSimpleDTO);
+            return stationRepository
+                    .findAllBySoftDeletedIsFalse(pageable)
+                    .map(stationMapper::toSimpleDTO);
         }
         return stationRepository
-                .findByTitleContainingIgnoreCase(query, pageable)
+                .findByTitleContainingIgnoreCaseAndSoftDeletedIsFalse(query, pageable)
                 .map(stationMapper::toSimpleDTO);
     }
 
@@ -74,7 +77,9 @@ public class StationService {
     }
 
     public List<StationSimpleDTO> getAll(String query) {
-        return stationRepository.findByTitleContainingIgnoreCase(query).stream()
+        return stationRepository
+                .findByTitleContainingIgnoreCase(query)
+                .stream()
                 .map(stationMapper::toSimpleDTO)
                 .toList();
     }
@@ -84,5 +89,18 @@ public class StationService {
         final Set<Train> suitableTrains = new HashSet<>();
         station.getTypes().stream().map(TrainType::getTrains).forEach(suitableTrains::addAll);
         return suitableTrains.stream().map(trainMapper::toSimpleDTO).toList();
+    }
+
+    public StationDTO update(UUID uuid, StationUpdateDTO dto) throws NotFoundException {
+        final Station station = getByIdOrThrow(uuid);
+        final Station newStation = stationRepository
+                .save(stationMapper.fromUpdateDTO(dto, station));
+        return stationMapper.toDTO(newStation);
+    }
+
+    public StationDTO softDelete(UUID uuid) throws NotFoundException {
+        final Station station = getByIdOrThrow(uuid);
+        station.setSoftDeleted(true);
+        return stationMapper.toDTO(stationRepository.save(station));
     }
 }

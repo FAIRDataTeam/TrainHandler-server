@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.station.StationDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.station.StationUpdateDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainSimpleDTO;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.station.StationService;
@@ -34,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,5 +69,22 @@ public class StationController {
     public List<TrainSimpleDTO> getSuitableTrains(@PathVariable UUID uuid)
             throws NotFoundException {
         return stationService.getSuitableStations(uuid);
+    }
+
+    @PutMapping(
+            path = "/{uuid}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public StationDTO update(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid StationUpdateDTO reqDto
+    ) throws NotFoundException {
+        return stationService.update(uuid, reqDto);
+    }
+
+    @DeleteMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public StationDTO delete(@PathVariable UUID uuid) throws NotFoundException {
+        return stationService.softDelete(uuid);
     }
 }

@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @MappedSuperclass
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @AllArgsConstructor

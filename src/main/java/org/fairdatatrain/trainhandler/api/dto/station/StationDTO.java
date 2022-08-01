@@ -52,6 +52,8 @@ public class StationDTO {
 
     private String metadata;
 
+    private Boolean softDeleted;
+
     private StationDirectorySimpleDTO directory;
 
     private List<TrainTypeSimpleDTO> types;

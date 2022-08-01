@@ -42,7 +42,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class Station extends BaseEntity {
 
     @NotBlank
@@ -65,6 +65,9 @@ public class Station extends BaseEntity {
 
     @Column(name = "metadata")
     private String metadata;
+
+    @Column(name = "soft_deleted")
+    private Boolean softDeleted;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "sync_item_status", nullable = false)

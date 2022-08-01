@@ -20,32 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.repository;
+package org.fairdatatrain.trainhandler.api.dto.train;
 
-import org.fairdatatrain.trainhandler.data.model.Station;
-import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import lombok.*;
 
-import java.util.List;
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder(toBuilder = true)
+public class TrainUpdateDTO {
 
-@Repository
-public interface StationRepository extends BaseRepository<Station> {
+    private Boolean softDeleted;
 
-    Page<Station> findAllBySoftDeletedIsFalse(Pageable pageable);
-
-    Page<Station> findByTitleContainingIgnoreCaseAndSoftDeletedIsFalse(
-            String query, Pageable pageable
-    );
-
-    @Query("""
-        SELECT s
-        FROM Station s
-        WHERE LOWER(s.title) LIKE %:query%
-            AND s.softDeleted IS FALSE
-        ORDER BY s.title""")
-    List<Station> findByTitleContainingIgnoreCase(@Param("query") String query);
 }
