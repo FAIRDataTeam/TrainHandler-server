@@ -25,6 +25,7 @@ package org.fairdatatrain.trainhandler.service.station;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.station.StationDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.station.StationUpdateDTO;
 import org.fairdatatrain.trainhandler.data.model.Station;
 import org.fairdatatrain.trainhandler.service.stationdirectory.StationDirectoryMapper;
 import org.fairdatatrain.trainhandler.service.traintype.TrainTypeMapper;
@@ -74,6 +75,12 @@ public class StationMapper {
                 .status(station.getStatus())
                 .directory(stationDirectoryMapper.toSimpleDTO(station.getDirectory()))
                 .types(station.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
+                .build();
+    }
+
+    public Station fromUpdateDTO(StationUpdateDTO dto, Station station) {
+        return station.toBuilder()
+                .softDeleted(dto.getSoftDeleted())
                 .build();
     }
 }

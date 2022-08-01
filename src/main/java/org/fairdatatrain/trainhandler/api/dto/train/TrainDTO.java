@@ -52,6 +52,8 @@ public class TrainDTO {
 
     private String metadata;
 
+    private Boolean softDeleted;
+
     private TrainGarageSimpleDTO garage;
 
     private List<TrainTypeSimpleDTO> types;
