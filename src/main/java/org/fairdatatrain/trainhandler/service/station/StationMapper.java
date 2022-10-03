@@ -54,6 +54,7 @@ public class StationMapper {
                                 .map(String::trim)
                                 .toList())
                 .status(station.getStatus())
+                .softDeleted(station.getSoftDeleted())
                 .metadata(station.getMetadata())
                 .directory(stationDirectoryMapper.toSimpleDTO(station.getDirectory()))
                 .types(station.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())

@@ -54,6 +54,7 @@ public class TrainMapper {
                                 .map(String::trim)
                                 .toList())
                 .status(train.getStatus())
+                .softDeleted(train.getSoftDeleted())
                 .metadata(train.getMetadata())
                 .garage(trainGarageMapper.toSimpleDTO(train.getGarage()))
                 .types(train.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
