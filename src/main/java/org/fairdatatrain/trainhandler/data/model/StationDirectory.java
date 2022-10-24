@@ -79,4 +79,11 @@ public class StationDirectory extends BaseEntity {
         }
         return stations;
     }
+
+    public Boolean isDeletable() {
+        if (getStatus().equals(SyncServiceStatus.SYNCING)) {
+            return false;
+        }
+        return getStations().isEmpty();
+    }
 }

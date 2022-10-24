@@ -42,6 +42,7 @@ public class StationDirectoryMapper {
                 .displayName(stationDirectory.getDisplayName())
                 .note(stationDirectory.getNote())
                 .status(stationDirectory.getStatus())
+                .deletable(stationDirectory.isDeletable())
                 .lastContactAt(
                         Optional.ofNullable(stationDirectory.getLastContactAt())
                                 .map(Timestamp::toInstant)

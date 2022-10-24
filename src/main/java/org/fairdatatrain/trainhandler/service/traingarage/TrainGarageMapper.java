@@ -43,6 +43,7 @@ public class TrainGarageMapper {
                 .note(trainGarage.getNote())
                 .metadata(trainGarage.getMetadata())
                 .status(trainGarage.getStatus())
+                .deletable(trainGarage.isDeletable())
                 .lastContactAt(
                         Optional.ofNullable(trainGarage.getLastContactAt())
                                 .map(Timestamp::toInstant)

@@ -47,6 +47,8 @@ public class StationDirectoryDTO {
 
     private SyncServiceStatus status;
 
+    private Boolean deletable;
+
     private Instant lastContactAt;
 
     private Instant createdAt;

@@ -79,4 +79,11 @@ public class TrainGarage extends BaseEntity {
         }
         return trains;
     }
+
+    public Boolean isDeletable() {
+        if (getStatus().equals(SyncServiceStatus.SYNCING)) {
+            return false;
+        }
+        return getTrains().isEmpty();
+    }
 }
