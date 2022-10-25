@@ -10,8 +10,8 @@ spring:
   main:
     banner-mode: off
   datasource:
-    url: jdbc:postgresql://postgres/train-handler
-    username: train-handler
+    url: jdbc:postgresql://postgres/train_handler
+    username: postgres
     password: password
   flyway:
     locations: classpath:db/migration

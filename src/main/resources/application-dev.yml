@@ -1,5 +1,5 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost/train-handler
-    username: train-handler
+    url: jdbc:postgresql://localhost/train_handler
+    username: postgres
     password: password
