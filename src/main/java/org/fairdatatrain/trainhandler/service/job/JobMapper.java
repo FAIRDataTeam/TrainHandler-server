@@ -72,7 +72,7 @@ public class JobMapper {
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .finishedAt(
-                        Optional.ofNullable(job.getStartedAt())
+                        Optional.ofNullable(job.getFinishedAt())
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
@@ -92,7 +92,7 @@ public class JobMapper {
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .finishedAt(
-                        Optional.ofNullable(job.getStartedAt())
+                        Optional.ofNullable(job.getFinishedAt())
                                 .map(Timestamp::toInstant)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
@@ -113,7 +113,7 @@ public class JobMapper {
                 .run(run)
                 .secret(randomSecret())
                 .createdAt(run.getCreatedAt())
-                .updatedAt(run.getCreatedAt())
+                .updatedAt(run.getUpdatedAt())
                 .version(run.getVersion())
                 .build();
     }
