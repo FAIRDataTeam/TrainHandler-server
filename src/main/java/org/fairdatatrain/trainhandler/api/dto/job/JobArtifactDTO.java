@@ -42,6 +42,8 @@ public class JobArtifactDTO {
 
     private Long bytesize;
 
+    private String contentType;
+
     private String hash;
 
     private Instant occurredAt;

@@ -43,6 +43,7 @@ public class JobArtifactMapper {
                 .displayName(artifact.getDisplayName())
                 .filename(artifact.getFilename())
                 .bytesize(artifact.getBytesize())
+                .contentType(artifact.getContentType())
                 .hash(artifact.getHash())
                 .occurredAt(artifact.getOccurredAt().toInstant())
                 .createdAt(artifact.getCreatedAt().toInstant())
