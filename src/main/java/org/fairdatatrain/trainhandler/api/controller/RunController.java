@@ -34,6 +34,7 @@ import org.fairdatatrain.trainhandler.service.async.AsyncEventPublisher;
 import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -41,6 +42,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @Tag(name = "Runs")
+@PreAuthorize("hasRole('user')")
 @RestController
 @RequestMapping("/runs")
 @RequiredArgsConstructor

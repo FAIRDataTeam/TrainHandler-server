@@ -5,3 +5,10 @@ spring:
     password: password
   flyway:
     locations: classpath:db/migration,classpath:dev/db/migration
+
+keycloak:
+  realm: myrealm
+  auth-server-url: http://localhost:8000
+  resource: myapi
+  public-client: true
+  bearer-only: true

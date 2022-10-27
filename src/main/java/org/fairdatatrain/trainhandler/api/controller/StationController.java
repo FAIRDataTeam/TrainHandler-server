@@ -33,6 +33,7 @@ import org.fairdatatrain.trainhandler.service.station.StationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Stations")
+@PreAuthorize("hasRole('user')")
 @RestController
 @RequestMapping("/stations")
 @RequiredArgsConstructor
