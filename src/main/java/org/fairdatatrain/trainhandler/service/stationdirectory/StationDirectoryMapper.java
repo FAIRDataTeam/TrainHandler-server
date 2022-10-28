@@ -40,6 +40,7 @@ public class StationDirectoryMapper {
                 .uuid(stationDirectory.getUuid())
                 .uri(stationDirectory.getUri())
                 .displayName(stationDirectory.getDisplayName())
+                .metadata(stationDirectory.getMetadata())
                 .note(stationDirectory.getNote())
                 .status(stationDirectory.getStatus())
                 .deletable(stationDirectory.isDeletable())

@@ -3,3 +3,5 @@ spring:
     url: jdbc:postgresql://localhost/train_handler
     username: postgres
     password: password
+  flyway:
+    locations: classpath:db/migration,classpath:dev/db/migration
