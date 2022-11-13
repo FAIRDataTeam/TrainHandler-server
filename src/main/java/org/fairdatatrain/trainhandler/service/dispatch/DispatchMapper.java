@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DispatchMapper {
 
-    @Value("${dispatch.root}")
+    @Value("${dispatcher.dispatch.root}")
     private String dispatchRoot;
 
     public DispatchPayload toPayload(Job job) {

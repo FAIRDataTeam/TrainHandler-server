@@ -55,6 +55,7 @@ public class DispatchService {
         try {
             final String response = webClient
                     .post()
+                    .uri(uri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(payload)
                     .retrieve()
@@ -62,6 +63,7 @@ public class DispatchService {
                     .block();
         }
         catch (WebClientException exception) {
+            exception.printStackTrace();
             log.warn(format(
                     "Dispatching job %s failed: %s", job.getUuid(), exception.getMessage()
             ));

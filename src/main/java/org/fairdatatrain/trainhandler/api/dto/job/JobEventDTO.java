@@ -25,7 +25,6 @@ package org.fairdatatrain.trainhandler.api.dto.job;
 import lombok.*;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -41,9 +40,9 @@ public class JobEventDTO {
 
     private String message;
 
-    private Instant occurredAt;
+    private String occurredAt;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

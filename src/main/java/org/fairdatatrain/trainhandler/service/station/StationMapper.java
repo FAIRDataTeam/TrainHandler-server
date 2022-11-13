@@ -58,9 +58,9 @@ public class StationMapper {
                 .metadata(station.getMetadata())
                 .directory(stationDirectoryMapper.toSimpleDTO(station.getDirectory()))
                 .types(station.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
-                .lastContactAt(station.getLastContactAt().toInstant())
-                .createdAt(station.getCreatedAt().toInstant())
-                .updatedAt(station.getUpdatedAt().toInstant())
+                .lastContactAt(station.getLastContactAt().toInstant().toString())
+                .createdAt(station.getCreatedAt().toInstant().toString())
+                .updatedAt(station.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

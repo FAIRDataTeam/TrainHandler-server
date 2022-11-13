@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 package org.fairdatatrain.trainhandler.api.dto.traingarage;
+
 import lombok.*;
 import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -48,10 +48,10 @@ public class TrainGarageDTO {
 
     private Boolean deletable;
 
-    private Instant lastContactAt;
+    private String lastContactAt;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }
 

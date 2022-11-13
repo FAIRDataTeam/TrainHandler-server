@@ -47,9 +47,10 @@ public class TrainGarageMapper {
                 .lastContactAt(
                         Optional.ofNullable(trainGarage.getLastContactAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
-                .createdAt(trainGarage.getCreatedAt().toInstant())
-                .updatedAt(trainGarage.getCreatedAt().toInstant())
+                .createdAt(trainGarage.getCreatedAt().toInstant().toString())
+                .updatedAt(trainGarage.getCreatedAt().toInstant().toString())
                 .build();
     }
 

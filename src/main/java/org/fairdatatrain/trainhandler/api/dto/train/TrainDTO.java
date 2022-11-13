@@ -27,7 +27,6 @@ import org.fairdatatrain.trainhandler.api.dto.traingarage.TrainGarageSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,9 +57,9 @@ public class TrainDTO {
 
     private List<TrainTypeSimpleDTO> types;
 
-    private Instant lastContactAt;
+    private String lastContactAt;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

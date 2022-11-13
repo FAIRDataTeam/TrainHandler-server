@@ -26,7 +26,6 @@ import lombok.*;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainDTO;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +46,7 @@ public class PlanDTO {
 
     private List<StationSimpleDTO> targets;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

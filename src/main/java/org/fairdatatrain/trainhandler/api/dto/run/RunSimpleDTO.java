@@ -25,7 +25,6 @@ package org.fairdatatrain.trainhandler.api.dto.run;
 import lombok.*;
 import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -47,13 +46,13 @@ public class RunSimpleDTO {
 
     private UUID planUuid;
 
-    private Instant shouldStartAt;
+    private String shouldStartAt;
 
-    private Instant startedAt;
+    private String startedAt;
 
-    private Instant finishedAt;
+    private String finishedAt;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

@@ -41,9 +41,9 @@ public class JobEventMapper {
                 .uuid(jobEvent.getUuid())
                 .message(jobEvent.getMessage())
                 .resultStatus(jobEvent.getResultStatus())
-                .createdAt(jobEvent.getCreatedAt().toInstant())
-                .updatedAt(jobEvent.getUpdatedAt().toInstant())
-                .occurredAt(jobEvent.getOccurredAt().toInstant())
+                .createdAt(jobEvent.getCreatedAt().toInstant().toString())
+                .updatedAt(jobEvent.getUpdatedAt().toInstant().toString())
+                .occurredAt(jobEvent.getOccurredAt().toInstant().toString())
                 .build();
     }
 

@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,10 +71,12 @@ public class JobMapper {
                 .startedAt(
                         Optional.ofNullable(job.getStartedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .finishedAt(
                         Optional.ofNullable(job.getFinishedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
@@ -90,17 +93,19 @@ public class JobMapper {
                 .startedAt(
                         Optional.ofNullable(job.getStartedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .finishedAt(
                         Optional.ofNullable(job.getFinishedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .run(runMapper.toSimpleDTO(job.getRun()))
                 .events(job.getEvents().stream().map(jobEventMapper::toDTO).toList())
                 .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
-                .createdAt(job.getCreatedAt().toInstant())
-                .updatedAt(job.getUpdatedAt().toInstant())
+                .createdAt(job.getCreatedAt().toInstant().toString())
+                .updatedAt(job.getUpdatedAt().toInstant().toString())
                 .version(job.getVersion())
                 .build();
     }

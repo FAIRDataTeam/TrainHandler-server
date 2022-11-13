@@ -47,9 +47,10 @@ public class StationDirectoryMapper {
                 .lastContactAt(
                         Optional.ofNullable(stationDirectory.getLastContactAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
-                .createdAt(stationDirectory.getCreatedAt().toInstant())
-                .updatedAt(stationDirectory.getUpdatedAt().toInstant())
+                .createdAt(stationDirectory.getCreatedAt().toInstant().toString())
+                .updatedAt(stationDirectory.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

@@ -24,7 +24,6 @@ package org.fairdatatrain.trainhandler.api.dto.traintype;
 
 import lombok.*;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -42,7 +41,7 @@ public class TrainTypeDTO {
 
     private String note;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

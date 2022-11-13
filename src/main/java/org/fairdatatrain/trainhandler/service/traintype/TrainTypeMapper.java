@@ -40,8 +40,8 @@ public class TrainTypeMapper {
                 .title(trainType.getTitle())
                 .uri(trainType.getUri())
                 .note(trainType.getNote())
-                .createdAt(trainType.getCreatedAt().toInstant())
-                .updatedAt(trainType.getUpdatedAt().toInstant())
+                .createdAt(trainType.getCreatedAt().toInstant().toString())
+                .updatedAt(trainType.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

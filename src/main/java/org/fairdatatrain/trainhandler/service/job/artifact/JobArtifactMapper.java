@@ -45,9 +45,9 @@ public class JobArtifactMapper {
                 .bytesize(artifact.getBytesize())
                 .contentType(artifact.getContentType())
                 .hash(artifact.getHash())
-                .occurredAt(artifact.getOccurredAt().toInstant())
-                .createdAt(artifact.getCreatedAt().toInstant())
-                .updatedAt(artifact.getUpdatedAt().toInstant())
+                .occurredAt(artifact.getOccurredAt().toInstant().toString())
+                .createdAt(artifact.getCreatedAt().toInstant().toString())
+                .updatedAt(artifact.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

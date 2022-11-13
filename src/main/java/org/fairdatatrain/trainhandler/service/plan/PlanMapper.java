@@ -59,8 +59,8 @@ public class PlanMapper {
                                 .map(PlanTarget::getStation)
                                 .map(stationMapper::toSimpleDTO)
                                 .toList())
-                .createdAt(plan.getCreatedAt().toInstant())
-                .updatedAt(plan.getUpdatedAt().toInstant())
+                .createdAt(plan.getCreatedAt().toInstant().toString())
+                .updatedAt(plan.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

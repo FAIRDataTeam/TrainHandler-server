@@ -24,7 +24,6 @@ package org.fairdatatrain.trainhandler.api.dto.job;
 
 import lombok.*;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -46,9 +45,9 @@ public class JobArtifactDTO {
 
     private String hash;
 
-    private Instant occurredAt;
+    private String occurredAt;
 
-    private Instant createdAt;
+    private String createdAt;
 
-    private Instant updatedAt;
+    private String updatedAt;
 }

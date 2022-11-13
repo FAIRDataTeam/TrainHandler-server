@@ -90,7 +90,9 @@ public class JobService {
         if (version < currentJob.getVersion()) {
             result.setResult(currentJob);
         }
-        log.info("No job update at this point, enqueueing...");
-        jobNotificationListener.enqueue(jobUuid, version, result);
+        else {
+            log.info("No job update at this point, enqueueing...");
+            jobNotificationListener.enqueue(jobUuid, version, result);
+        }
     }
 }

@@ -36,6 +36,7 @@ import org.fairdatatrain.trainhandler.service.plan.PlanMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,17 +62,20 @@ public class RunMapper {
                 .shouldStartAt(
                         Optional.ofNullable(run.getShouldStartAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .startedAt(
                         Optional.ofNullable(run.getStartedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .finishedAt(
                         Optional.ofNullable(run.getFinishedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
-                .createdAt(run.getCreatedAt().toInstant())
-                .updatedAt(run.getUpdatedAt().toInstant())
+                .createdAt(run.getCreatedAt().toInstant().toString())
+                .updatedAt(run.getUpdatedAt().toInstant().toString())
                 .build();
     }
 
@@ -90,17 +94,20 @@ public class RunMapper {
                 .shouldStartAt(
                         Optional.ofNullable(run.getShouldStartAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .startedAt(
                         Optional.ofNullable(run.getStartedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
                 .finishedAt(
                         Optional.ofNullable(run.getFinishedAt())
                                 .map(Timestamp::toInstant)
+                                .map(Instant::toString)
                                 .orElse(null))
-                .createdAt(run.getCreatedAt().toInstant())
-                .updatedAt(run.getUpdatedAt().toInstant())
+                .createdAt(run.getCreatedAt().toInstant().toString())
+                .updatedAt(run.getUpdatedAt().toInstant().toString())
                 .build();
     }
 

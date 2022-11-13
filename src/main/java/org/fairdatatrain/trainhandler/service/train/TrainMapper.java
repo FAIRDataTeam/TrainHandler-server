@@ -58,9 +58,9 @@ public class TrainMapper {
                 .metadata(train.getMetadata())
                 .garage(trainGarageMapper.toSimpleDTO(train.getGarage()))
                 .types(train.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
-                .lastContactAt(train.getLastContactAt().toInstant())
-                .createdAt(train.getCreatedAt().toInstant())
-                .updatedAt(train.getUpdatedAt().toInstant())
+                .lastContactAt(train.getLastContactAt().toInstant().toString())
+                .createdAt(train.getCreatedAt().toInstant().toString())
+                .updatedAt(train.getUpdatedAt().toInstant().toString())
                 .build();
     }
 
