@@ -79,4 +79,10 @@ public class Job extends BaseEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "job")
     private List<JobArtifact> artifacts;
+
+    public boolean isFinished() {
+        return getStatus().equals(JobStatus.FAILED)
+                || getStatus().equals(JobStatus.FINISHED)
+                || getStatus().equals(JobStatus.ERRORED);
+    }
 }

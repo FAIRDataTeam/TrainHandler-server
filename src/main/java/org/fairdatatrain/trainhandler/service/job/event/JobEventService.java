@@ -47,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -113,7 +114,13 @@ public class JobEventService {
         }
         if (reqDto.getResultStatus() != null) {
             job.setStatus(reqDto.getResultStatus());
+            if (job.getFinishedAt() == null && job.isFinished()) {
+                job.setFinishedAt(Timestamp.from(reqDto.getOccurredAt()));
+            }
             run.setStatus(getNextRunStatus(job, reqDto));
+            if (run.getFinishedAt() == null && run.isFinished()) {
+                run.setFinishedAt(Timestamp.from(reqDto.getOccurredAt()));
+            }
         }
         final JobEvent jobEvent = jobEventRepository.save(
                 jobEventMapper.fromCreateDTO(reqDto, job)

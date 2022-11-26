@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 
 import javax.persistence.*;
@@ -77,4 +78,10 @@ public class Run extends BaseEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "run")
     private List<Job> jobs;
+
+    public boolean isFinished() {
+        return getStatus().equals(RunStatus.FAILED)
+                || getStatus().equals(RunStatus.FINISHED)
+                || getStatus().equals(RunStatus.ERRORED);
+    }
 }
