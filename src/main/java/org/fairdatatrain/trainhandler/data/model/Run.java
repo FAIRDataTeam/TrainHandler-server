@@ -28,7 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
-import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 import org.fairdatatrain.trainhandler.data.model.enums.RunStatus;
 
 import javax.persistence.*;

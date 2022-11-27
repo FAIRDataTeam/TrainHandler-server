@@ -80,7 +80,9 @@ public class RunMapper {
     }
 
     public RunDTO toDTO(Run run) {
-        final List<JobSimpleDTO> jobs = run.getJobs().stream()
+        final List<JobSimpleDTO> jobs = run
+                .getJobs()
+                .stream()
                 .map(jobMapper::toSimpleDTO)
                 .toList();
         return RunDTO.builder()

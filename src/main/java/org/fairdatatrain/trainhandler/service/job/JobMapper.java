@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -79,7 +80,13 @@ public class JobMapper {
                                 .map(Instant::toString)
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
-                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
+                .artifacts(job
+                        .getArtifacts()
+                        .stream()
+                        .sorted(Comparator.comparing(JobArtifact::getOccurredAt))
+                        .map(jobArtifactMapper::toDTO)
+                        .toList()
+                )
                 .runUuid(job.getRun().getUuid())
                 .version(job.getVersion())
                 .build();
@@ -102,8 +109,20 @@ public class JobMapper {
                                 .orElse(null))
                 .target(stationMapper.toSimpleDTO(job.getTarget().getStation()))
                 .run(runMapper.toSimpleDTO(job.getRun()))
-                .events(job.getEvents().stream().map(jobEventMapper::toDTO).toList())
-                .artifacts(job.getArtifacts().stream().map(jobArtifactMapper::toDTO).toList())
+                .events(job
+                        .getEvents()
+                        .stream()
+                        .sorted(Comparator.comparing(JobEvent::getOccurredAt))
+                        .map(jobEventMapper::toDTO)
+                        .toList()
+                )
+                .artifacts(job
+                        .getArtifacts()
+                        .stream()
+                        .sorted(Comparator.comparing(JobArtifact::getOccurredAt))
+                        .map(jobArtifactMapper::toDTO)
+                        .toList()
+                )
                 .createdAt(job.getCreatedAt().toInstant().toString())
                 .updatedAt(job.getUpdatedAt().toInstant().toString())
                 .version(job.getVersion())

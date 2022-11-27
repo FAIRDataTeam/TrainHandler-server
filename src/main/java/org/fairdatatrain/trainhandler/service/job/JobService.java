@@ -36,8 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -54,9 +52,6 @@ public class JobService {
     private final JobMapper jobMapper;
 
     private final JobNotificationListener jobNotificationListener;
-
-    @PersistenceContext
-    private final EntityManager entityManager;
 
     public Job getByIdOrThrow(UUID uuid) throws NotFoundException {
         return jobRepository
