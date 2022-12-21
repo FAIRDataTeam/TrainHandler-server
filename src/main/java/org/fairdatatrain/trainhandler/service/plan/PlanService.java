@@ -22,6 +22,8 @@
  */
 package org.fairdatatrain.trainhandler.service.plan;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.plan.PlanCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.plan.PlanDTO;
@@ -42,8 +44,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
 

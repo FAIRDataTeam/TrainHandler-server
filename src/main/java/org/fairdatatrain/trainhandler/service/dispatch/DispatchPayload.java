@@ -22,9 +22,9 @@
  */
 package org.fairdatatrain.trainhandler.service.dispatch;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @AllArgsConstructor

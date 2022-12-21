@@ -22,6 +22,8 @@
  */
 package org.fairdatatrain.trainhandler.service.job.event;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.job.JobDTO;
@@ -45,8 +47,6 @@ import org.fairdatatrain.trainhandler.service.run.RunMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.*;
 

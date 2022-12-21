@@ -22,10 +22,10 @@
  */
 package org.fairdatatrain.trainhandler.api.dto.job;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.fairdatatrain.trainhandler.data.model.enums.JobStatus;
 
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @AllArgsConstructor

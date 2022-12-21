@@ -22,6 +22,9 @@
  */
 package org.fairdatatrain.trainhandler.service.job.artifact;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactCreateDTO;
@@ -39,9 +42,6 @@ import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.ValidationException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;

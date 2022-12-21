@@ -22,6 +22,7 @@
  */
 package org.fairdatatrain.trainhandler.api.controller;
 
+import jakarta.validation.ValidationException;
 import org.fairdatatrain.trainhandler.api.dto.error.ErrorDTO;
 import org.fairdatatrain.trainhandler.exception.CannotPerformException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
@@ -30,8 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import javax.validation.ValidationException;
 
 import static java.lang.String.format;
 

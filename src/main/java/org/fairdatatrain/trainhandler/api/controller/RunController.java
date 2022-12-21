@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.run.RunCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.run.RunDTO;
@@ -38,7 +39,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import javax.validation.Valid;
 import java.util.UUID;
 
 @Tag(name = "Runs")

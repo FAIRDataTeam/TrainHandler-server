@@ -22,6 +22,9 @@
  */
 package org.fairdatatrain.trainhandler.data.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,9 +33,6 @@ import lombok.experimental.SuperBuilder;
 import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
 import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

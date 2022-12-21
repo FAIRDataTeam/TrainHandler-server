@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.job.*;
 import org.fairdatatrain.trainhandler.exception.JobSecurityException;
@@ -32,7 +33,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
