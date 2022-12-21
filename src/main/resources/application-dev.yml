@@ -17,3 +17,7 @@ keycloak:
 dispatcher:
   dispatch:
     root: http://localhost:8080
+
+logging:
+  level:
+    com.zaxxer.hikari: TRACE

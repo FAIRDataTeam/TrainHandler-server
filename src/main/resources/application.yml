@@ -13,6 +13,10 @@ spring:
     url: jdbc:postgresql://postgres/train_handler
     username: postgres
     password: password
+    hikari:
+      pool-name: PGHikariPool
+      max-pool-size: 10
+      min-idle: 5
   flyway:
     locations: classpath:db/migration
   jpa:
