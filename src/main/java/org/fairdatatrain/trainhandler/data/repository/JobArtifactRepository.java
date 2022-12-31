@@ -24,8 +24,40 @@ package org.fairdatatrain.trainhandler.data.repository;
 
 import org.fairdatatrain.trainhandler.data.model.JobArtifact;
 import org.fairdatatrain.trainhandler.data.repository.base.BaseRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface JobArtifactRepository extends BaseRepository<JobArtifact> {
+
+    @Query(
+        """
+        SELECT ja
+        FROM JobArtifact ja
+            JOIN Job j ON ja.job = j
+            JOIN PlanTarget pt ON j.target = pt
+            JOIN Plan p ON pt.plan = p
+        WHERE p.uuid = :planUuid
+            AND p.publishArtifacts = TRUE
+            AND pt.publishArtifacts = TRUE
+        """
+    )
+    List<JobArtifact> getPublicJobArtifactsOfPlan(UUID planUuid);
+
+    @Query(
+            """
+            SELECT ja
+            FROM JobArtifact ja
+                JOIN Job j ON ja.job = j
+                JOIN PlanTarget pt ON j.target = pt
+                JOIN Plan p ON pt.plan = p
+            WHERE pt.uuid = :targetUuid
+                AND p.publishArtifacts = TRUE
+                AND pt.publishArtifacts = TRUE
+            """
+    )
+    List<JobArtifact> getPublicJobArtifactsOfTarget(UUID targetUuid);
 }

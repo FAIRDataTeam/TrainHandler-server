@@ -23,10 +23,7 @@
 package org.fairdatatrain.trainhandler.service.plan;
 
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanCreateDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanUpdateDTO;
+import org.fairdatatrain.trainhandler.api.dto.plan.*;
 import org.fairdatatrain.trainhandler.data.model.Plan;
 import org.fairdatatrain.trainhandler.data.model.PlanTarget;
 import org.fairdatatrain.trainhandler.data.model.Train;
@@ -55,10 +52,11 @@ public class PlanMapper {
                 .note(plan.getNote())
                 .train(trainMapper.toDTO(plan.getTrain()))
                 .targets(
-                        plan.getTargets().stream()
-                                .map(PlanTarget::getStation)
-                                .map(stationMapper::toSimpleDTO)
+                        plan.getTargets()
+                                .stream()
+                                .map(this::toPlanTargetDTO)
                                 .toList())
+                .publishArtifacts(plan.getPublishArtifacts())
                 .createdAt(plan.getCreatedAt().toInstant().toString())
                 .updatedAt(plan.getUpdatedAt().toInstant().toString())
                 .build();
@@ -70,6 +68,13 @@ public class PlanMapper {
                 .displayName(plan.getDisplayName())
                 .note(plan.getNote())
                 .train(trainMapper.toSimpleDTO(plan.getTrain()))
+                .targets(
+                        plan.getTargets()
+                                .stream()
+                                .map(this::toPlanTargetDTO)
+                                .toList()
+                )
+                .publishArtifacts(plan.getPublishArtifacts())
                 .build();
     }
 
@@ -81,6 +86,7 @@ public class PlanMapper {
                 .note(reqDto.getNote())
                 .train(train)
                 .targets(Collections.emptyList())
+                .publishArtifacts(reqDto.getPublishArtifacts())
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -92,6 +98,14 @@ public class PlanMapper {
         plan.setDisplayName(reqDto.getDisplayName());
         plan.setNote(reqDto.getNote());
         plan.setUpdatedAt(now);
+        plan.setPublishArtifacts(reqDto.getPublishArtifacts());
         return plan;
+    }
+
+    public PlanTargetDTO toPlanTargetDTO(PlanTarget target) {
+        return PlanTargetDTO.builder()
+                .station(stationMapper.toSimpleDTO(target.getStation()))
+                .publishArtifacts(target.getPublishArtifacts())
+                .build();
     }
 }

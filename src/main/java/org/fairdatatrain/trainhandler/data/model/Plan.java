@@ -53,6 +53,10 @@ public class Plan extends BaseEntity {
     private String note;
 
     @NotNull
+    @Column(name = "publish_artifacts", nullable = false)
+    private Boolean publishArtifacts;
+
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "train_id")
     private Train train;

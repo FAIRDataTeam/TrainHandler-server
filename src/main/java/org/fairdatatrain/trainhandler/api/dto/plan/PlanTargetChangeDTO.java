@@ -20,43 +20,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.data.model;
+package org.fairdatatrain.trainhandler.api.dto.plan;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.fairdatatrain.trainhandler.data.model.base.BaseEntity;
+import lombok.*;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@Entity(name = "PlanTarget")
-@Table(name = "plan_target")
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-public class PlanTarget extends BaseEntity {
+@Getter
+@Setter
+@Builder
+public class PlanTargetChangeDTO {
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "station_id")
-    private Station station;
+    private UUID stationUuid;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "plan_id")
-    private Plan plan;
-
-    @NotNull
-    @Column(name = "publish_artifacts", nullable = false)
-    private Boolean publishArtifacts;
-
-    public UUID getStationUuid() {
-        return station.getUuid();
-    }
+    private Boolean publishArtifacts = false;
 }

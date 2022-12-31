@@ -42,11 +42,13 @@ public class PlanUpdateDTO {
     private UUID trainUuid;
 
     @NotNull
-    private List<UUID> stationUuids;
+    private List<PlanTargetChangeDTO> targets;
 
     @NotBlank
     private String displayName;
 
     @NotNull
     private String note;
+
+    private Boolean publishArtifacts = false;
 }
