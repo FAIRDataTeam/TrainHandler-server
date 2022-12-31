@@ -25,6 +25,8 @@ package org.fairdatatrain.trainhandler.api.dto.plan;
 import lombok.*;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainSimpleDTO;
 
+import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -40,5 +42,11 @@ public class PlanSimpleDTO {
 
     private String note;
 
+    @NotNull
     private TrainSimpleDTO train;
+
+    @NotNull
+    private List<PlanTargetDTO> targets;
+
+    private Boolean publishArtifacts;
 }

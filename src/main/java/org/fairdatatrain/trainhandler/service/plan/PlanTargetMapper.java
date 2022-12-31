@@ -23,6 +23,7 @@
 package org.fairdatatrain.trainhandler.service.plan;
 
 import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.api.dto.plan.PlanTargetChangeDTO;
 import org.fairdatatrain.trainhandler.data.model.Plan;
 import org.fairdatatrain.trainhandler.data.model.PlanTarget;
 import org.fairdatatrain.trainhandler.data.model.Station;
@@ -34,11 +35,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PlanTargetMapper {
 
-    public PlanTarget forPlan(Plan newPlan, Station station) {
+    public PlanTarget forPlan(Plan newPlan, PlanTargetChangeDTO targetDto, Station station) {
         return PlanTarget.builder()
                 .uuid(UUID.randomUUID())
                 .plan(newPlan)
                 .station(station)
+                .publishArtifacts(targetDto.getPublishArtifacts())
                 .createdAt(newPlan.getCreatedAt())
                 .updatedAt(newPlan.getUpdatedAt())
                 .build();

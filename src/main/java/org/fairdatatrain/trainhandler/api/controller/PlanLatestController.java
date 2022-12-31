@@ -24,12 +24,10 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.job.*;
+import org.fairdatatrain.trainhandler.api.dto.job.JobArtifactDTO;
 import org.fairdatatrain.trainhandler.data.model.JobArtifact;
-import org.fairdatatrain.trainhandler.exception.JobSecurityException;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
-import org.fairdatatrain.trainhandler.service.job.artifact.JobArtifactService;
-import org.fairdatatrain.trainhandler.service.job.event.JobEventService;
+import org.fairdatatrain.trainhandler.service.plan.latest.PlanLatestService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -38,45 +36,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
 
-@Tag(name = "Runs")
+@Tag(name = "Plans")
 @PreAuthorize("hasRole('user')")
 @RestController
-@RequestMapping("/runs")
+@RequestMapping("/plans")
 @RequiredArgsConstructor
-public class JobArtifactController {
+public class PlanLatestController {
 
-    public static final String ARTIFACT_CALLBACK_LOCATION = "/{runUuid}/jobs/{jobUuid}/artifacts";
+    private final PlanLatestService planLatestService;
 
-    private final JobArtifactService jobArtifactService;
-
-    private final JobEventService jobEventService;
-
-    @GetMapping(
-            path = "/{runUuid}/jobs/{jobUuid}/artifacts",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public List<JobArtifactDTO> getJobArtifacts(
-            @PathVariable UUID runUuid, @PathVariable UUID jobUuid
-    ) throws NotFoundException {
-        return jobArtifactService.getArtifacts(runUuid, jobUuid);
+    @GetMapping(path = "/{planUuid}/latest/artifacts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobArtifactDTO> getLatestArtifacts(@PathVariable UUID planUuid) throws NotFoundException {
+        return planLatestService.getLatestArtifacts(planUuid);
     }
 
-    @GetMapping(
-            path = "/{runUuid}/jobs/{jobUuid}/artifacts/{artifactUuid}/download"
-    )
-    public ResponseEntity<Resource> getJobArtifactData(
-            @PathVariable UUID runUuid,
-            @PathVariable UUID jobUuid,
-            @PathVariable UUID artifactUuid
+    @GetMapping(path = "/{planUuid}/latest/artifacts/{artifactUuid}")
+    public ResponseEntity<Resource> downloadLatestArtifact(
+            @PathVariable UUID planUuid, @PathVariable UUID artifactUuid
     ) throws NotFoundException {
-        final JobArtifact artifact = jobArtifactService.getArtifact(runUuid, jobUuid, artifactUuid);
-        final byte[] data = jobArtifactService.getArtifactData(artifact);
+        final JobArtifact artifact = planLatestService.getLatestJobArtifact(planUuid, artifactUuid);
+        final byte[] data = planLatestService.getArtifactData(artifact);
         final ByteArrayResource resource = new ByteArrayResource(data);
         return ResponseEntity
                 .ok()
@@ -89,18 +73,13 @@ public class JobArtifactController {
                 .body(resource);
     }
 
-    @PostMapping(
-            path = ARTIFACT_CALLBACK_LOCATION,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+    @GetMapping(
+            path = "/{planUuid}/target/{targetUuid}/latest/artifacts",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public JobArtifactDTO addJobArtifact(
-            @PathVariable UUID runUuid,
-            @PathVariable UUID jobUuid,
-            @RequestBody @Valid JobArtifactCreateDTO reqDto
-    ) throws NotFoundException, JobSecurityException {
-        final JobArtifactDTO dto = jobArtifactService.createArtifact(runUuid, jobUuid, reqDto);
-        jobEventService.notify(jobUuid);
-        return dto;
+    public List<JobArtifactDTO> getLatestArtifactsOfTarget(
+            @PathVariable UUID planUuid, @PathVariable UUID targetUuid
+    ) throws NotFoundException {
+        return planLatestService.getLatestArtifactsOfTarget(planUuid, targetUuid);
     }
 }

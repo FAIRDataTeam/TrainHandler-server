@@ -23,11 +23,10 @@
 package org.fairdatatrain.trainhandler.utils;
 
 import java.util.Collection;
-import java.util.List;
 
 public class CompareUtils {
 
-    public static <T> boolean compareListContents(List<T> listA, Collection<T> listB) {
+    public static <T> boolean compareListContents(Collection<T> listA, Collection<T> listB) {
         if (listA.size() != listB.size()) {
             return false;
         }

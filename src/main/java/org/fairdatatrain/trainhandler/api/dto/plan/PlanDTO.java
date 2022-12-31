@@ -23,7 +23,6 @@
 package org.fairdatatrain.trainhandler.api.dto.plan;
 
 import lombok.*;
-import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainDTO;
 
 import java.util.List;
@@ -44,7 +43,9 @@ public class PlanDTO {
 
     private TrainDTO train;
 
-    private List<StationSimpleDTO> targets;
+    private List<PlanTargetDTO> targets;
+
+    private Boolean publishArtifacts;
 
     private String createdAt;
 

@@ -23,10 +23,7 @@
 package org.fairdatatrain.trainhandler.service.plan;
 
 import lombok.RequiredArgsConstructor;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanCreateDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanSimpleDTO;
-import org.fairdatatrain.trainhandler.api.dto.plan.PlanUpdateDTO;
+import org.fairdatatrain.trainhandler.api.dto.plan.*;
 import org.fairdatatrain.trainhandler.data.model.Plan;
 import org.fairdatatrain.trainhandler.data.model.PlanTarget;
 import org.fairdatatrain.trainhandler.data.model.Station;
@@ -45,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -90,19 +88,26 @@ public class PlanService {
 
     @Transactional
     public PlanDTO create(PlanCreateDTO reqDto) throws NotFoundException {
-        // TODO: validate? (empty list of stations)
         final Train train = trainService.getByIdOrThrow(reqDto.getTrainUuid());
-        final List<Station> stations = new ArrayList<>();
-        for (UUID stationUuid : reqDto.getStationUuids()) {
-            stations.add(stationService.getByIdOrThrow(stationUuid));
+        final Map<UUID, Station> stations = new HashMap<>();
+        for (PlanTargetChangeDTO targetDto : reqDto.getTargets()) {
+            stations.put(targetDto.getStationUuid(),
+                    stationService.getByIdOrThrow(targetDto.getStationUuid()));
         }
         final Plan newPlan =
                 planRepository.saveAndFlush(planMapper.fromCreateDTO(reqDto, train));
         entityManager.flush();
         entityManager.refresh(newPlan);
         final List<PlanTarget> targets =
-                stations.stream()
-                        .map(station -> planTargetMapper.forPlan(newPlan, station))
+                reqDto.getTargets()
+                        .stream()
+                        .map(targetDto -> {
+                            return planTargetMapper.forPlan(
+                                    newPlan,
+                                    targetDto,
+                                    stations.get(targetDto.getStationUuid())
+                            );
+                        })
                         .toList();
         newPlan.setTargets(targets);
         planTargetRepository.saveAllAndFlush(targets);
@@ -116,16 +121,25 @@ public class PlanService {
             throws NotFoundException, CannotPerformException {
         final String action = "update";
         final Plan plan = getByIdOrThrow(uuid);
-        final Set<UUID> oldStationUuids =
-                plan.getTargets().stream()
+        final Set<UUID> oldStationUuids = plan
+                .getTargets()
+                        .stream()
                         .map(PlanTarget::getStation)
                         .map(Station::getUuid)
                         .collect(Collectors.toSet());
-        final Set<UUID> newStationUuids = new HashSet<>(reqDto.getStationUuids());
+        final Map<UUID, PlanTarget> oldTargets = plan
+                .getTargets()
+                .stream()
+                .collect(Collectors.toMap(PlanTarget::getStationUuid, Function.identity()));
+        final Set<UUID> newStationUuids = reqDto
+                .getTargets()
+                .stream()
+                .map(PlanTargetChangeDTO::getStationUuid)
+                .collect(Collectors.toSet());
         final boolean planExecuted = !plan.getRuns().isEmpty();
         final boolean changeTrain = reqDto.getTrainUuid() != plan.getTrain().getUuid();
         final boolean changeTargets =
-                compareListContents(reqDto.getStationUuids(), oldStationUuids);
+                compareListContents(newStationUuids, oldStationUuids);
         if (planExecuted && changeTrain) {
             throw new CannotPerformException(
                     ENTITY_NAME,
@@ -141,10 +155,19 @@ public class PlanService {
                     "It is not possible to change targets of already used plan.");
         }
         final Train train = trainService.getByIdOrThrow(reqDto.getTrainUuid());
-        final List<Station> stations = new ArrayList<>();
-        for (UUID stationUuid : reqDto.getStationUuids()) {
-            if (!oldStationUuids.contains(stationUuid)) {
-                stations.add(stationService.getByIdOrThrow(stationUuid));
+        final List<PlanTarget> targets = new ArrayList<>();
+        for (PlanTargetChangeDTO targetDto : reqDto.getTargets()) {
+            if (oldTargets.containsKey(targetDto.getStationUuid())) {
+                final PlanTarget target = oldTargets.get(targetDto.getStationUuid());
+                target.setPublishArtifacts(targetDto.getPublishArtifacts());
+                targets.add(planTargetRepository.saveAndFlush(target));
+            }
+            else {
+                final Station station =
+                        stationService.getByIdOrThrow(targetDto.getStationUuid());
+                targets.add(planTargetRepository.saveAndFlush(
+                        planTargetMapper.forPlan(plan, targetDto, station)
+                ));
             }
         }
         for (PlanTarget target : plan.getTargets()) {
@@ -152,16 +175,9 @@ public class PlanService {
                 planTargetRepository.delete(target);
             }
         }
+        plan.setTargets(targets);
         final Plan updatedPlan =
                 planRepository.saveAndFlush(planMapper.fromUpdateDTO(reqDto, plan, train));
-        entityManager.flush();
-        entityManager.refresh(updatedPlan);
-        final List<PlanTarget> targets =
-                stations.stream()
-                        .map(station -> planTargetMapper.forPlan(updatedPlan, station))
-                        .toList();
-        updatedPlan.setTargets(targets);
-        planTargetRepository.saveAllAndFlush(targets);
         entityManager.flush();
         entityManager.refresh(updatedPlan);
         return planMapper.toDTO(updatedPlan);
