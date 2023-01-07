@@ -127,13 +127,13 @@ public class JobArtifactService {
         }
         final byte[] data = Base64.getDecoder().decode(reqDto.getBase64data());
         validate(reqDto, data);
-        final JobArtifact jobArtifact = jobArtifactRepository.save(
+        final JobArtifact jobArtifact = jobArtifactRepository.saveAndFlush(
                 jobArtifactMapper.fromCreateDTO(reqDto, job, data)
         );
         job.setVersion(jobArtifact.getUpdatedAt().toInstant().toEpochMilli());
-        jobRepository.save(job);
+        jobRepository.saveAndFlush(job);
         job.getRun().setVersion(job.getVersion());
-        runRepository.save(job.getRun());
+        runRepository.saveAndFlush(job.getRun());
         entityManager.flush();
         entityManager.refresh(jobArtifact);
         return jobArtifactMapper.toDTO(jobArtifact);

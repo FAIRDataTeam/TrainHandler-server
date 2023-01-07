@@ -122,13 +122,13 @@ public class JobEventService {
                 run.setFinishedAt(Timestamp.from(reqDto.getOccurredAt()));
             }
         }
-        final JobEvent jobEvent = jobEventRepository.save(
+        final JobEvent jobEvent = jobEventRepository.saveAndFlush(
                 jobEventMapper.fromCreateDTO(reqDto, job)
         );
         job.setVersion(jobEvent.getUpdatedAt().toInstant().toEpochMilli());
-        jobRepository.save(job);
+        jobRepository.saveAndFlush(job);
         job.getRun().setVersion(job.getVersion());
-        runRepository.save(run);
+        runRepository.saveAndFlush(run);
         entityManager.flush();
         entityManager.refresh(jobEvent);
         return jobEventMapper.toDTO(jobEvent);

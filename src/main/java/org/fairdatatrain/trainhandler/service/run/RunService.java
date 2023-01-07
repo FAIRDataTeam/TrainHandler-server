@@ -96,7 +96,7 @@ public class RunService {
         final List<Job> jobs = plan.getTargets().stream()
                 .map(target -> jobMapper.fromTarget(newRun, target))
                 .toList();
-        jobRepository.saveAll(jobs);
+        jobRepository.saveAllAndFlush(jobs);
         entityManager.flush();
         entityManager.refresh(newRun);
         newRun.getJobs().forEach(entityManager::refresh);
@@ -107,7 +107,8 @@ public class RunService {
     public RunDTO update(UUID uuid, RunUpdateDTO reqDto) throws NotFoundException {
         // TODO: abort (?)
         final Run run = getByIdOrThrow(uuid);
-        final Run updatedRun = runRepository.save(runMapper.fromUpdateDTO(reqDto, run));
+        final Run updatedRun =
+                runRepository.saveAndFlush(runMapper.fromUpdateDTO(reqDto, run));
         return runMapper.toDTO(updatedRun);
     }
 

@@ -38,7 +38,6 @@ import org.fairdatatrain.trainhandler.data.model.enums.SyncServiceStatus;
 import org.fairdatatrain.trainhandler.data.repository.*;
 import org.fairdatatrain.trainhandler.service.indexing.BaseIndexer;
 import org.fairdatatrain.trainhandler.utils.ValueFactoryUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +84,6 @@ public class StationDirectoryIndexer {
         MECHANISM_TRAIN_TYPES.put(FDT.RESTAPI, List.of(FDT.RESTTRAIN));
     }
 
-    @Async
     @Transactional
     public void indexDirectory(StationDirectory stationDirectory) {
         final Set<String> visitedUris = new HashSet<>();
@@ -131,15 +129,16 @@ public class StationDirectoryIndexer {
         stationDirectory.setMetadata("");
         stationDirectory.setLastContactAt(now());
         stationDirectory.setStatus(SyncServiceStatus.SYNCED);
-        stationDirectoryRepository.save(stationDirectory);
+        stationDirectoryRepository.saveAndFlush(stationDirectory);
     }
 
     private void updateFaultyDirectory(StationDirectory stationDirectory) {
         stationDirectory.setStatus(SyncServiceStatus.UNREACHABLE);
-        stationDirectoryRepository.save(stationDirectory);
+        stationDirectoryRepository.saveAndFlush(stationDirectory);
     }
 
     private void updateStations(StationDirectory stationDirectory, List<Station> stations) {
+        final List<Station> stationsToSave = new ArrayList<>();
         final Map<String, Station> existingStations = stationDirectory
                 .getStations()
                 .stream()
@@ -155,6 +154,7 @@ public class StationDirectoryIndexer {
             else {
                 station.setDirectory(stationDirectory);
                 stationDirectory.getStations().add(station);
+                stationsToSave.add(station);
             }
         });
         existingStations.forEach((uri, station) -> {
@@ -163,7 +163,7 @@ public class StationDirectoryIndexer {
             }
         });
 
-        stationRepository.saveAll(stationDirectory.getStations());
+        stationRepository.saveAllAndFlush(stationsToSave);
     }
 
     private void deprecateStation(Station existingStation) {
@@ -209,7 +209,7 @@ public class StationDirectoryIndexer {
                 .toList();
 
         final Set<IRI> interactionMechanisms =
-                getObjectsBy(model, resource, FDT.INTERACTIONMECHANISM)
+                getObjectsBy(model, resource, FDT.IMPLEMENTSINTERACTIONMECHANISM)
                         .stream()
                         .map(Value::stringValue)
                         .map(ValueFactoryUtils::i)
@@ -250,6 +250,7 @@ public class StationDirectoryIndexer {
                 .lastContactAt(now())
                 .createdAt(now())
                 .updatedAt(now())
+                .softDeleted(false)
                 .build();
     }
 

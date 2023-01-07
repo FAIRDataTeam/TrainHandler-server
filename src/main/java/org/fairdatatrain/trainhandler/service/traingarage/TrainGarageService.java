@@ -31,7 +31,9 @@ import org.fairdatatrain.trainhandler.data.repository.TrainGarageRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -72,30 +74,36 @@ public class TrainGarageService {
         return trainGarageMapper.toDTO(trainGarage);
     }
 
+    @Transactional
     public TrainGarageDTO create(TrainGarageChangeDTO reqDto) {
         // TODO: validate?
         final TrainGarage newTrainGarage =
-                trainGarageRepository.save(trainGarageMapper.fromCreateDTO(reqDto));
-        trainGarageIndexer.indexGarage(newTrainGarage);
+                trainGarageRepository.saveAndFlush(trainGarageMapper.fromCreateDTO(reqDto));
         return trainGarageMapper.toDTO(newTrainGarage);
     }
 
+    @Transactional
     public TrainGarageDTO update(UUID uuid, TrainGarageChangeDTO reqDto)
             throws NotFoundException {
         // TODO: validate?
         final TrainGarage trainGarage = getByIdOrThrow(uuid);
         final TrainGarage updatedTrainGarage =
-                trainGarageRepository.save(
+                trainGarageRepository.saveAndFlush(
                         trainGarageMapper.fromUpdateDTO(reqDto, trainGarage));
-        trainGarageIndexer.indexGarage(updatedTrainGarage);
         return trainGarageMapper.toDTO(updatedTrainGarage);
     }
 
+    @Transactional
     public void reindex(UUID uuid) throws NotFoundException {
         final TrainGarage trainGarage = getByIdOrThrow(uuid);
         trainGarage.setStatus(SyncServiceStatus.SYNCING);
         final TrainGarage updatedTrainGarage =
-                trainGarageRepository.save(trainGarage);
-        trainGarageIndexer.indexGarage(updatedTrainGarage);
+                trainGarageRepository.saveAndFlush(trainGarage);
+        triggerAsyncIndexing(updatedTrainGarage);
+    }
+
+    @Async
+    protected void triggerAsyncIndexing(TrainGarage trainGarage) {
+        trainGarageIndexer.indexGarage(trainGarage);
     }
 }

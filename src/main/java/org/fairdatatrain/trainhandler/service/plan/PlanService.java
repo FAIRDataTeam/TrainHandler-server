@@ -96,7 +96,8 @@ public class PlanService {
         for (UUID stationUuid : reqDto.getStationUuids()) {
             stations.add(stationService.getByIdOrThrow(stationUuid));
         }
-        final Plan newPlan = planRepository.save(planMapper.fromCreateDTO(reqDto, train));
+        final Plan newPlan =
+                planRepository.saveAndFlush(planMapper.fromCreateDTO(reqDto, train));
         entityManager.flush();
         entityManager.refresh(newPlan);
         final List<PlanTarget> targets =
@@ -104,7 +105,7 @@ public class PlanService {
                         .map(station -> planTargetMapper.forPlan(newPlan, station))
                         .toList();
         newPlan.setTargets(targets);
-        planTargetRepository.saveAll(targets);
+        planTargetRepository.saveAllAndFlush(targets);
         entityManager.flush();
         entityManager.refresh(newPlan);
         return planMapper.toDTO(newPlan);
@@ -151,7 +152,8 @@ public class PlanService {
                 planTargetRepository.delete(target);
             }
         }
-        final Plan updatedPlan = planRepository.save(planMapper.fromUpdateDTO(reqDto, plan, train));
+        final Plan updatedPlan =
+                planRepository.saveAndFlush(planMapper.fromUpdateDTO(reqDto, plan, train));
         entityManager.flush();
         entityManager.refresh(updatedPlan);
         final List<PlanTarget> targets =
@@ -159,7 +161,7 @@ public class PlanService {
                         .map(station -> planTargetMapper.forPlan(updatedPlan, station))
                         .toList();
         updatedPlan.setTargets(targets);
-        planTargetRepository.saveAll(targets);
+        planTargetRepository.saveAllAndFlush(targets);
         entityManager.flush();
         entityManager.refresh(updatedPlan);
         return planMapper.toDTO(updatedPlan);
