@@ -59,8 +59,12 @@ public class StationDirectoryController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = HttpStatus.CREATED)
-    public StationDirectoryDTO create(@Valid @RequestBody StationDirectoryChangeDTO reqDto) {
-        return stationDirectoryService.create(reqDto);
+    public StationDirectoryDTO create(
+            @Valid @RequestBody StationDirectoryChangeDTO reqDto
+    ) throws NotFoundException {
+        final StationDirectoryDTO dto = stationDirectoryService.create(reqDto);
+        stationDirectoryService.reindex(dto.getUuid());
+        return dto;
     }
 
     @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,7 +76,9 @@ public class StationDirectoryController {
     public StationDirectoryDTO update(
             @PathVariable UUID uuid, @Valid @RequestBody StationDirectoryChangeDTO reqDto)
             throws NotFoundException {
-        return stationDirectoryService.update(uuid, reqDto);
+        final StationDirectoryDTO dto = stationDirectoryService.update(uuid, reqDto);
+        stationDirectoryService.reindex(dto.getUuid());
+        return dto;
     }
 
     @DeleteMapping(path = "/{uuid}")

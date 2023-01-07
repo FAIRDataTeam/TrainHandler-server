@@ -38,7 +38,6 @@ import org.fairdatatrain.trainhandler.data.repository.TrainGarageRepository;
 import org.fairdatatrain.trainhandler.data.repository.TrainRepository;
 import org.fairdatatrain.trainhandler.data.repository.TrainTypeRepository;
 import org.fairdatatrain.trainhandler.service.indexing.BaseIndexer;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +64,6 @@ public class TrainGarageIndexer {
 
     private final BaseIndexer baseIndexer;
 
-    @Async
     @Transactional
     public void indexGarage(TrainGarage trainGarage) {
         final Set<String> visitedUris = new HashSet<>();
@@ -110,15 +108,16 @@ public class TrainGarageIndexer {
         trainGarage.setMetadata("");
         trainGarage.setLastContactAt(now());
         trainGarage.setStatus(SyncServiceStatus.SYNCED);
-        trainGarageRepository.save(trainGarage);
+        trainGarageRepository.saveAndFlush(trainGarage);
     }
 
     private void updateFaultyGarage(TrainGarage trainGarage) {
         trainGarage.setStatus(SyncServiceStatus.UNREACHABLE);
-        trainGarageRepository.save(trainGarage);
+        trainGarageRepository.saveAndFlush(trainGarage);
     }
 
     private void updateTrains(TrainGarage trainGarage, List<Train> trains) {
+        final List<Train> trainsToSave = new ArrayList<>();
         final Map<String, Train> existingTrains = trainGarage
                 .getTrains()
                 .stream()
@@ -134,6 +133,7 @@ public class TrainGarageIndexer {
             else {
                 train.setGarage(trainGarage);
                 trainGarage.getTrains().add(train);
+                trainsToSave.add(train);
             }
         });
         existingTrains.forEach((uri, train) -> {
@@ -142,7 +142,7 @@ public class TrainGarageIndexer {
             }
         });
 
-        trainRepository.saveAll(trainGarage.getTrains());
+        trainRepository.saveAllAndFlush(trainsToSave);
     }
 
     private void deprecateTrain(Train existingTrain) {
@@ -220,6 +220,7 @@ public class TrainGarageIndexer {
                 .lastContactAt(now())
                 .createdAt(now())
                 .updatedAt(now())
+                .softDeleted(false)
                 .build();
     }
 }

@@ -31,6 +31,7 @@ import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -69,18 +70,20 @@ public class TrainTypeService {
         return trainTypeMapper.toDTO(trainType);
     }
 
+    @Transactional
     public TrainTypeDTO create(TrainTypeChangeDTO reqDto) {
         // TODO: validate?
         final TrainType newTrainType =
-                trainTypeRepository.save(trainTypeMapper.fromCreateDTO(reqDto));
+                trainTypeRepository.saveAndFlush(trainTypeMapper.fromCreateDTO(reqDto));
         return trainTypeMapper.toDTO(newTrainType);
     }
 
+    @Transactional
     public TrainTypeDTO update(UUID uuid, TrainTypeChangeDTO reqDto) throws NotFoundException {
         // TODO: validate?
         final TrainType trainType = getByIdOrThrow(uuid);
         final TrainType updatedTrainType =
-                trainTypeRepository.save(trainTypeMapper.fromUpdateDTO(reqDto, trainType));
+                trainTypeRepository.saveAndFlush(trainTypeMapper.fromUpdateDTO(reqDto, trainType));
         return trainTypeMapper.toDTO(updatedTrainType);
     }
 }

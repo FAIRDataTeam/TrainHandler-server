@@ -36,6 +36,7 @@ import org.fairdatatrain.trainhandler.service.station.StationMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -91,15 +92,18 @@ public class TrainService {
         return suitableStations.stream().map(stationMapper::toSimpleDTO).toList();
     }
 
+    @Transactional
     public TrainDTO update(UUID uuid, TrainUpdateDTO dto) throws NotFoundException {
         final Train train = getByIdOrThrow(uuid);
-        final Train newTrain = trainRepository.save(trainMapper.fromUpdateDTO(dto, train));
+        final Train newTrain =
+                trainRepository.saveAndFlush(trainMapper.fromUpdateDTO(dto, train));
         return trainMapper.toDTO(newTrain);
     }
 
+    @Transactional
     public TrainDTO softDelete(UUID uuid) throws NotFoundException {
         final Train train = getByIdOrThrow(uuid);
         train.setSoftDeleted(true);
-        return trainMapper.toDTO(trainRepository.save(train));
+        return trainMapper.toDTO(trainRepository.saveAndFlush(train));
     }
 }

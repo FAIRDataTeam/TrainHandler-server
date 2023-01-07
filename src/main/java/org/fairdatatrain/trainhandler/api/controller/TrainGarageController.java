@@ -59,8 +59,12 @@ public class TrainGarageController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = HttpStatus.CREATED)
-    public TrainGarageDTO create(@Valid @RequestBody TrainGarageChangeDTO reqDto) {
-        return trainGarageService.create(reqDto);
+    public TrainGarageDTO create(
+            @Valid @RequestBody TrainGarageChangeDTO reqDto
+    ) throws NotFoundException {
+        final TrainGarageDTO dto = trainGarageService.create(reqDto);
+        trainGarageService.reindex(dto.getUuid());
+        return dto;
     }
 
     @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,9 +74,11 @@ public class TrainGarageController {
 
     @PutMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TrainGarageDTO update(
-            @PathVariable UUID uuid, @Valid @RequestBody TrainGarageChangeDTO reqDto)
-            throws NotFoundException {
-        return trainGarageService.update(uuid, reqDto);
+            @PathVariable UUID uuid, @Valid @RequestBody TrainGarageChangeDTO reqDto
+    ) throws NotFoundException {
+        final TrainGarageDTO dto = trainGarageService.update(uuid, reqDto);
+        trainGarageService.reindex(dto.getUuid());
+        return dto;
     }
 
     @DeleteMapping(path = "/{uuid}")

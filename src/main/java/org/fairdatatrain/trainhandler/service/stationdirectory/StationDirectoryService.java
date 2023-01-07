@@ -31,7 +31,9 @@ import org.fairdatatrain.trainhandler.data.repository.StationDirectoryRepository
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -72,30 +74,37 @@ public class StationDirectoryService {
         return stationDirectoryMapper.toDTO(stationDirectory);
     }
 
+    @Transactional
     public StationDirectoryDTO create(StationDirectoryChangeDTO reqDto) {
         // TODO: validate?
         final StationDirectory newStationDirectory =
-                stationDirectoryRepository.save(stationDirectoryMapper.fromCreateDTO(reqDto));
-        stationDirectoryIndexer.indexDirectory(newStationDirectory);
+                stationDirectoryRepository.saveAndFlush(
+                        stationDirectoryMapper.fromCreateDTO(reqDto));
         return this.stationDirectoryMapper.toDTO(newStationDirectory);
     }
 
+    @Transactional
     public StationDirectoryDTO update(UUID uuid, StationDirectoryChangeDTO reqDto)
             throws NotFoundException {
         // TODO: validate?
         final StationDirectory stationDirectory = getByIdOrThrow(uuid);
         final StationDirectory updatedStationDirectory =
-                stationDirectoryRepository.save(
+                stationDirectoryRepository.saveAndFlush(
                         stationDirectoryMapper.fromUpdateDTO(reqDto, stationDirectory));
-        stationDirectoryIndexer.indexDirectory(updatedStationDirectory);
         return this.stationDirectoryMapper.toDTO(updatedStationDirectory);
     }
 
+    @Transactional
     public void reindex(UUID uuid) throws NotFoundException {
         final StationDirectory stationDirectory = getByIdOrThrow(uuid);
         stationDirectory.setStatus(SyncServiceStatus.SYNCING);
         final StationDirectory updatedStationDirectory =
-                stationDirectoryRepository.save(stationDirectory);
-        stationDirectoryIndexer.indexDirectory(updatedStationDirectory);
+                stationDirectoryRepository.saveAndFlush(stationDirectory);
+        triggerAsyncIndexing(updatedStationDirectory);
+    }
+
+    @Async
+    protected void triggerAsyncIndexing(StationDirectory stationDirectory) {
+        stationDirectoryIndexer.indexDirectory(stationDirectory);
     }
 }
