@@ -228,7 +228,7 @@ public class TrainGarageIndexer {
                 .title(title)
                 .description(description == null ? "" : description)
                 .keywords(String.join(",", keywords))
-                .metadata(write(model.filter(resource, null, null)))
+                .metadata(write(model))
                 .types(matchingTrainTypes)
                 .garage(trainGarage)
                 .status(SyncItemStatus.SYNCED)

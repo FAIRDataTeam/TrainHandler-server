@@ -63,6 +63,14 @@ public class Station extends BaseEntity {
     @Column(name = "keywords", nullable = false)
     private String keywords;
 
+    @NotNull
+    @Column(name = "endpoint_url", nullable = false)
+    private String endpointUrl;
+
+    @NotNull
+    @Column(name = "endpoint_description", nullable = false)
+    private String endpointDescription;
+
     @Column(name = "metadata")
     private String metadata;
 

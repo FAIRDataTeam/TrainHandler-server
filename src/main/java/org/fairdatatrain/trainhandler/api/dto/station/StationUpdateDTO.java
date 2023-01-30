@@ -42,6 +42,10 @@ public class StationUpdateDTO {
 
     private List<String> keywords;
 
+    private String endpointUrl;
+
+    private String endpointDescription;
+
     private String metadata;
 
     private List<UUID> trainTypeUuids;

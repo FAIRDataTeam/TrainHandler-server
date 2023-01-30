@@ -218,6 +218,8 @@ public class StationDirectoryIndexer {
         log.info(format("Station found: %s", resource));
         final String title = getStringObjectBy(model, resource, RDFS.LABEL);
         final String description = getStringObjectBy(model, resource, RDFS.COMMENT);
+        final String endpointUrl = getStringObjectBy(model, resource, DCAT.ENDPOINT_URL);
+        final String endpointDescription = getStringObjectBy(model, resource, DCAT.ENDPOINT_DESCRIPTION);
         final List<String> keywords = getObjectsBy(model, resource, DCAT.KEYWORD)
                 .stream()
                 .map(Value::stringValue)
@@ -237,7 +239,11 @@ public class StationDirectoryIndexer {
                 .collect(Collectors.toSet());
 
         if (title == null) {
-            log.warn(format("Skipping station %s (missing required information)", resource));
+            log.warn(format("Skipping station %s (missing required information: title)", resource));
+            return null;
+        }
+        if (endpointUrl == null) {
+            log.warn(format("Skipping station %s (missing required information: endpoint URL)", resource));
             return null;
         }
 
@@ -258,7 +264,9 @@ public class StationDirectoryIndexer {
                 .title(title)
                 .description(description == null ? "" : description)
                 .keywords(String.join(",", keywords))
-                .metadata(write(model.filter(resource, null, null)))
+                .endpointUrl(endpointUrl)
+                .endpointDescription(endpointDescription == null ? "" : endpointDescription)
+                .metadata(write(model))
                 .types(matchingTrainTypes)
                 .directory(stationDirectory)
                 .status(SyncItemStatus.SYNCED)

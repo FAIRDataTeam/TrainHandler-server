@@ -40,6 +40,10 @@ public class StationCreateDTO {
 
     private String description;
 
+    private String endpointUrl;
+
+    private String endpointDescription;
+
     private List<String> keywords;
 
     private String metadata;
