@@ -45,6 +45,10 @@ public class StationSimpleDTO {
 
     private List<String> keywords;
 
+    private String endpointUrl;
+
+    private String endpointDescription;
+
     private SyncItemStatus status;
 
     private StationDirectorySimpleDTO directory;

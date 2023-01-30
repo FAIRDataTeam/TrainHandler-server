@@ -47,6 +47,10 @@ public class StationDTO {
 
     private List<String> keywords;
 
+    private String endpointUrl;
+
+    private String endpointDescription;
+
     private SyncItemStatus status;
 
     private String metadata;
