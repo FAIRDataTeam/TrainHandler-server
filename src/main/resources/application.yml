@@ -1,18 +1,18 @@
 dispatcher:
   polling:
-    timeout: PT2M
+    timeout: ${FDT_POLLING_TIMEOUT:PT2M}
   dispatch:
-    root: http://localhost:8080
-    initDelay: PT30S
-    interval: PT30S
+    root: ${FDT_DISPATCH_ROOT:http://localhost:8080}
+    initDelay: ${FDT_DISPATCH_INIT_DELAY:PT30S}
+    interval: ${FDT_DISPATCH_INTERVAL:PT30S}
 
 spring:
   main:
     banner-mode: off
   datasource:
-    url: jdbc:postgresql://postgres/train_handler
-    username: postgres
-    password: password
+    url: jdbc:postgresql://${FDT_POSTGRES_HOST:postgres}:${FDT_POSTGRES_PORT:5432}/${FDT_POSTGRES_DB:train_handler}
+    username: ${FDT_POSTGRES_USERNAME:postgres}
+    password: ${FDT_POSTGRES_PASSWORD:password}
     hikari:
       pool-name: PGHikariPool
       max-pool-size: 10
@@ -24,6 +24,14 @@ spring:
       hibernate:
         ddl-auto: validate
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+keycloak:
+  enabled: ${FDT_KEYCLOAK_ENABLED:false}
+  realm: ${FDT_KEYCLOAK_REALM:myrealm}
+  auth-server-url: ${FDT_KEYCLOAK_URL:http://localhost:8000}
+  resource: ${FDT_KEYCLOAK_RESOURCE:myapi}
+  public-client: true
+  bearer-only: true
 
 springdoc:
   swagger-ui:
