@@ -73,7 +73,6 @@ public class Train extends BaseEntity {
     @Column(name = "status", columnDefinition = "sync_item_status", nullable = false)
     private SyncItemStatus status;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "train_garage_id")
     private TrainGarage garage;

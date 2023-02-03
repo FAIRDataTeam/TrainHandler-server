@@ -24,6 +24,7 @@ package org.fairdatatrain.trainhandler.service.train;
 
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
+import org.fairdatatrain.trainhandler.api.dto.train.TrainCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainUpdateDTO;
@@ -33,6 +34,8 @@ import org.fairdatatrain.trainhandler.data.model.TrainType;
 import org.fairdatatrain.trainhandler.data.repository.TrainRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.station.StationMapper;
+import org.fairdatatrain.trainhandler.service.traingarage.TrainGarageIndexer;
+import org.fairdatatrain.trainhandler.service.traintype.TrainTypeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,10 @@ public class TrainService {
     private final TrainMapper trainMapper;
 
     private final StationMapper stationMapper;
+
+    private final TrainTypeService trainTypeService;
+
+    private final TrainGarageIndexer trainGarageIndexer;
 
     public Train getByIdOrThrow(UUID uuid) throws NotFoundException {
         return trainRepository
@@ -95,8 +102,13 @@ public class TrainService {
     @Transactional
     public TrainDTO update(UUID uuid, TrainUpdateDTO dto) throws NotFoundException {
         final Train train = getByIdOrThrow(uuid);
-        final Train newTrain =
-                trainRepository.saveAndFlush(trainMapper.fromUpdateDTO(dto, train));
+        final List<TrainType> trainTypes =
+                trainTypeService.getTrainTypes(dto.getTrainTypeUuids());
+        Train newTrain =
+                trainRepository.saveAndFlush(trainMapper.fromUpdateDTO(dto, train, trainTypes));
+        if (dto.getFetch()) {
+            newTrain = updateFetch(newTrain);
+        }
         return trainMapper.toDTO(newTrain);
     }
 
@@ -105,5 +117,26 @@ public class TrainService {
         final Train train = getByIdOrThrow(uuid);
         train.setSoftDeleted(true);
         return trainMapper.toDTO(trainRepository.saveAndFlush(train));
+    }
+
+    @Transactional
+    public TrainDTO create(TrainCreateDTO dto) {
+        final List<TrainType> trainTypes =
+                trainTypeService.getTrainTypes(dto.getTrainTypeUuids());
+        Train newTrain = trainRepository
+                .saveAndFlush(trainMapper.fromCreateDTO(dto, trainTypes));
+        if (dto.getFetch()) {
+            newTrain = updateFetch(newTrain);
+        }
+        return trainMapper.toDTO(newTrain);
+    }
+
+    private Train updateFetch(Train train) {
+        final Train fetchedTrain = trainGarageIndexer.tryToFetchTrain(train.getUri());
+        if (fetchedTrain != null) {
+            return trainRepository
+                    .saveAndFlush(trainMapper.updateFetch(train, fetchedTrain));
+        }
+        return train;
     }
 }

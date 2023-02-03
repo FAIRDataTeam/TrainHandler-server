@@ -24,6 +24,7 @@ package org.fairdatatrain.trainhandler.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.api.dto.station.StationCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.station.StationUpdateDTO;
@@ -60,6 +61,17 @@ public class StationController {
     public List<StationSimpleDTO> getPaged(
             @RequestParam(value = "query", required = false, defaultValue = "") String query) {
         return stationService.getAll(query);
+    }
+
+    @PutMapping(
+            path = "",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public StationDTO create(
+            @RequestBody @Valid StationCreateDTO reqDto
+    ) throws NotFoundException {
+        return stationService.create(reqDto);
     }
 
     @GetMapping(path = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)

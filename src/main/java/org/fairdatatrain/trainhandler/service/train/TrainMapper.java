@@ -23,15 +23,22 @@
 package org.fairdatatrain.trainhandler.service.train;
 
 import lombok.RequiredArgsConstructor;
+import org.fairdatatrain.trainhandler.api.dto.train.TrainCreateDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainSimpleDTO;
 import org.fairdatatrain.trainhandler.api.dto.train.TrainUpdateDTO;
 import org.fairdatatrain.trainhandler.data.model.Train;
+import org.fairdatatrain.trainhandler.data.model.TrainType;
+import org.fairdatatrain.trainhandler.data.model.enums.SyncItemStatus;
 import org.fairdatatrain.trainhandler.service.traingarage.TrainGarageMapper;
 import org.fairdatatrain.trainhandler.service.traintype.TrainTypeMapper;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
 @Component
 @RequiredArgsConstructor
@@ -79,9 +86,45 @@ public class TrainMapper {
                 .build();
     }
 
-    public Train fromUpdateDTO(TrainUpdateDTO dto, Train train) {
+    public Train fromUpdateDTO(TrainUpdateDTO dto, Train train, List<TrainType> trainTypes) {
         return train.toBuilder()
+                .uri(dto.getUri())
+                .title(dto.getTitle())
+                .description(dto.getDescription())
+                .keywords(String.join(KEYWORD_SEP, dto.getKeywords()))
+                .metadata(dto.getMetadata())
+                .types(trainTypes)
                 .softDeleted(dto.getSoftDeleted())
+                .updatedAt(now())
+                .build();
+    }
+
+    public Train fromCreateDTO(TrainCreateDTO dto, List<TrainType> trainTypes) {
+        final Timestamp now = now();
+        return Train.builder()
+                .uri(dto.getUri())
+                .title(dto.getTitle())
+                .description(dto.getDescription())
+                .keywords(String.join(KEYWORD_SEP, dto.getKeywords()))
+                .metadata(dto.getMetadata())
+                .types(trainTypes)
+                .status(SyncItemStatus.SYNCED)
+                .softDeleted(false)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    public Train updateFetch(Train train, Train fetchedTrain) {
+        return train.toBuilder()
+                .title(fetchedTrain.getTitle())
+                .description(fetchedTrain.getDescription())
+                .keywords(fetchedTrain.getKeywords())
+                .metadata(fetchedTrain.getMetadata())
+                .lastContactAt(fetchedTrain.getLastContactAt())
+                .types(fetchedTrain.getTypes())
+                .status(fetchedTrain.getStatus())
+                .updatedAt(now())
                 .build();
     }
 }
