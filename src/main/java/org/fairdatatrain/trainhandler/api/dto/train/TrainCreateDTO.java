@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.fairdatatrain.trainhandler.api.dto.station;
+package org.fairdatatrain.trainhandler.api.dto.train;
 
 import lombok.*;
 
@@ -32,7 +32,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class StationUpdateDTO {
+public class TrainCreateDTO {
 
     private String uri;
 
@@ -46,8 +46,5 @@ public class StationUpdateDTO {
 
     private List<UUID> trainTypeUuids;
 
-    private Boolean softDeleted;
-
     private Boolean fetch = false;
-
 }

@@ -76,7 +76,6 @@ public class Station extends BaseEntity {
     @Column(name = "last_contact_at")
     private Timestamp lastContactAt;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "station_directory_id")
     private StationDirectory directory;

@@ -24,6 +24,9 @@ package org.fairdatatrain.trainhandler.api.dto.train;
 
 import lombok.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -31,6 +34,20 @@ import lombok.*;
 @Builder(toBuilder = true)
 public class TrainUpdateDTO {
 
+    private String uri;
+
+    private String title;
+
+    private String description;
+
+    private List<String> keywords;
+
+    private String metadata;
+
+    private List<UUID> trainTypeUuids;
+
     private Boolean softDeleted;
+
+    private Boolean fetch = false;
 
 }

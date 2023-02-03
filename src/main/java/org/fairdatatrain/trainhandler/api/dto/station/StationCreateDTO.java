@@ -32,7 +32,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class StationUpdateDTO {
+public class StationCreateDTO {
 
     private String uri;
 
@@ -46,8 +46,5 @@ public class StationUpdateDTO {
 
     private List<UUID> trainTypeUuids;
 
-    private Boolean softDeleted;
-
     private Boolean fetch = false;
-
 }

@@ -33,6 +33,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -45,10 +47,24 @@ public class TrainTypeService {
 
     private final TrainTypeMapper trainTypeMapper;
 
-    private TrainType getByIdOrThrow(UUID uuid) throws NotFoundException {
+    public TrainType getByIdOrThrow(UUID uuid) throws NotFoundException {
         return trainTypeRepository
                 .findById(uuid)
                 .orElseThrow(() -> new NotFoundException(ENTITY_NAME, uuid));
+    }
+
+    public TrainType getByIdOrNull(UUID uuid) {
+        return trainTypeRepository
+                .findById(uuid)
+                .orElse(null);
+    }
+
+    public List<TrainType> getTrainTypes(List<UUID> uuids) {
+        return uuids
+                .stream()
+                .map(this::getByIdOrNull)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public void delete(UUID uuid) throws NotFoundException {

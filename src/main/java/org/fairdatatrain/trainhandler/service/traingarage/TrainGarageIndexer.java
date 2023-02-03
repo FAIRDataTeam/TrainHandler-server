@@ -97,11 +97,26 @@ public class TrainGarageIndexer {
                 toVisitUris.addAll(baseIndexer.extractChildren(model));
             }
             catch (Exception exception) {
-                log.debug(format("Skipping %s (exception: %s)", uri, exception));
+                log.debug(format("Failed to fetch %s (exception: %s)", uri, exception));
             }
         }
 
         updateTrains(trainGarage, trains);
+    }
+
+    public Train tryToFetchTrain(String uri) {
+        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        try {
+            final Model model = baseIndexer.makeRequest(uri);
+            final List<Train> trains = extractTrains(null, model, trainTypes);
+            if (trains.size() > 0) {
+                return trains.get(0);
+            }
+        }
+        catch (Exception exception) {
+            log.debug(format("Skipping %s (exception: %s)", uri, exception));
+        }
+        return null;
     }
 
     private void updateGarage(TrainGarage trainGarage, Model model) {

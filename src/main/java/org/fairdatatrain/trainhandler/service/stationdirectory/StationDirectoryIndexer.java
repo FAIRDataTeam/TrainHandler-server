@@ -125,6 +125,21 @@ public class StationDirectoryIndexer {
         updateStations(stationDirectory, stations);
     }
 
+    public Station tryToFetchStation(String uri) {
+        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        try {
+            final Model model = baseIndexer.makeRequest(uri);
+            final List<Station> stations = extractStations(null, model, trainTypes);
+            if (stations.size() > 0) {
+                return stations.get(0);
+            }
+        }
+        catch (Exception exception) {
+            log.debug(format("Failed to fetch %s (exception: %s)", uri, exception));
+        }
+        return null;
+    }
+
     private void updateDirectory(StationDirectory stationDirectory, Model model) {
         stationDirectory.setMetadata("");
         stationDirectory.setLastContactAt(now());
