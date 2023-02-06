@@ -35,8 +35,10 @@ import org.fairdatatrain.trainhandler.service.traintype.TrainTypeMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
@@ -65,9 +67,18 @@ public class StationMapper {
                 .status(station.getStatus())
                 .softDeleted(station.getSoftDeleted())
                 .metadata(station.getMetadata())
-                .directory(stationDirectoryMapper.toSimpleDTO(station.getDirectory()))
+                .directory(
+                        Optional.ofNullable(station.getDirectory())
+                                .map(stationDirectoryMapper::toSimpleDTO)
+                                .orElse(null)
+                )
                 .types(station.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
-                .lastContactAt(station.getLastContactAt().toInstant().toString())
+                .lastContactAt(
+                        Optional.ofNullable(station.getLastContactAt())
+                                .map(Timestamp::toInstant)
+                                .map(Instant::toString)
+                                .orElse(null)
+                )
                 .createdAt(station.getCreatedAt().toInstant().toString())
                 .updatedAt(station.getUpdatedAt().toInstant().toString())
                 .build();
@@ -85,7 +96,11 @@ public class StationMapper {
                 .endpointUrl(station.getEndpointUrl())
                 .endpointDescription(station.getEndpointDescription())
                 .status(station.getStatus())
-                .directory(stationDirectoryMapper.toSimpleDTO(station.getDirectory()))
+                .directory(
+                        Optional.ofNullable(station.getDirectory())
+                                .map(stationDirectoryMapper::toSimpleDTO)
+                                .orElse(null)
+                )
                 .types(station.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
                 .build();
     }
@@ -100,7 +115,10 @@ public class StationMapper {
                 .endpointDescription(dto.getEndpointDescription())
                 .metadata(dto.getMetadata())
                 .types(trainTypes)
-                .softDeleted(dto.getSoftDeleted())
+                .softDeleted(
+                        Optional.ofNullable(dto.getSoftDeleted())
+                                .orElse(station.getSoftDeleted())
+                )
                 .updatedAt(now())
                 .build();
     }

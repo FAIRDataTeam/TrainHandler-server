@@ -24,6 +24,7 @@ package org.fairdatatrain.trainhandler.api.dto.station;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,21 +35,30 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class StationCreateDTO {
 
+    @NotNull
     private String uri;
 
+    @NotNull
     private String title;
 
+    @NotNull
     private String description;
 
+    @NotNull
     private String endpointUrl;
 
+    @NotNull
     private String endpointDescription;
 
+    @NotNull
     private List<String> keywords;
 
+    @NotNull
     private String metadata;
 
+    @NotNull
     private List<UUID> trainTypeUuids;
 
+    @NotNull
     private Boolean fetch = false;
 }

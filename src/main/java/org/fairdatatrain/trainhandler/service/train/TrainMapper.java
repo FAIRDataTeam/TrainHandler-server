@@ -35,8 +35,10 @@ import org.fairdatatrain.trainhandler.service.traintype.TrainTypeMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 
@@ -63,9 +65,18 @@ public class TrainMapper {
                 .status(train.getStatus())
                 .softDeleted(train.getSoftDeleted())
                 .metadata(train.getMetadata())
-                .garage(trainGarageMapper.toSimpleDTO(train.getGarage()))
+                .garage(
+                        Optional.ofNullable(train.getGarage())
+                                .map(trainGarageMapper::toSimpleDTO)
+                                .orElse(null)
+                )
                 .types(train.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
-                .lastContactAt(train.getLastContactAt().toInstant().toString())
+                .lastContactAt(
+                        Optional.ofNullable(train.getLastContactAt())
+                                .map(Timestamp::toInstant)
+                                .map(Instant::toString)
+                                .orElse(null)
+                )
                 .createdAt(train.getCreatedAt().toInstant().toString())
                 .updatedAt(train.getUpdatedAt().toInstant().toString())
                 .build();
@@ -81,7 +92,11 @@ public class TrainMapper {
                                 .map(String::trim)
                                 .toList())
                 .status(train.getStatus())
-                .garage(trainGarageMapper.toSimpleDTO(train.getGarage()))
+                .garage(
+                        Optional.ofNullable(train.getGarage())
+                                .map(trainGarageMapper::toSimpleDTO)
+                                .orElse(null)
+                )
                 .types(train.getTypes().stream().map(trainTypeMapper::toSimpleDTO).toList())
                 .build();
     }
@@ -94,7 +109,10 @@ public class TrainMapper {
                 .keywords(String.join(KEYWORD_SEP, dto.getKeywords()))
                 .metadata(dto.getMetadata())
                 .types(trainTypes)
-                .softDeleted(dto.getSoftDeleted())
+                .softDeleted(
+                        Optional.ofNullable(dto.getSoftDeleted())
+                                .orElse(train.getSoftDeleted())
+                )
                 .updatedAt(now())
                 .build();
     }

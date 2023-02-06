@@ -63,7 +63,7 @@ public class StationController {
         return stationService.getAll(query);
     }
 
-    @PutMapping(
+    @PostMapping(
             path = "",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
