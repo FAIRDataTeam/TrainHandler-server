@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeDTO;
+import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.traintype.TrainTypeService;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Train Types")
@@ -52,6 +54,11 @@ public class TrainTypeController {
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
             Pageable pageable) {
         return trainTypeService.getPaged(query, pageable);
+    }
+
+    @GetMapping(path = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<TrainTypeSimpleDTO> getAll() {
+        return trainTypeService.getAll();
     }
 
     @PostMapping(

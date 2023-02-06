@@ -25,6 +25,7 @@ package org.fairdatatrain.trainhandler.service.traintype;
 import lombok.RequiredArgsConstructor;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeChangeDTO;
 import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeDTO;
+import org.fairdatatrain.trainhandler.api.dto.traintype.TrainTypeSimpleDTO;
 import org.fairdatatrain.trainhandler.data.model.TrainType;
 import org.fairdatatrain.trainhandler.data.repository.TrainTypeRepository;
 import org.fairdatatrain.trainhandler.exception.NotFoundException;
@@ -101,5 +102,13 @@ public class TrainTypeService {
         final TrainType updatedTrainType =
                 trainTypeRepository.saveAndFlush(trainTypeMapper.fromUpdateDTO(reqDto, trainType));
         return trainTypeMapper.toDTO(updatedTrainType);
+    }
+
+    public List<TrainTypeSimpleDTO> getAll() {
+        return trainTypeRepository
+                .findAll()
+                .stream()
+                .map(trainTypeMapper::toSimpleDTO)
+                .toList();
     }
 }
