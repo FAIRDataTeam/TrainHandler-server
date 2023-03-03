@@ -28,12 +28,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface TrainTypeRepository extends BaseRepository<TrainType> {
-
-    List<TrainType> findAllBy();
 
     Page<TrainType> findByTitleContainingIgnoreCase(String query, Pageable pageable);
 }

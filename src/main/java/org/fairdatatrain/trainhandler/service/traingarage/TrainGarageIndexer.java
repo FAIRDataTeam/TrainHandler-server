@@ -69,7 +69,7 @@ public class TrainGarageIndexer {
         final Set<String> visitedUris = new HashSet<>();
         final Queue<String> toVisitUris = new LinkedList<>();
         final List<Train> trains = new ArrayList<>();
-        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        final List<TrainType> trainTypes = trainTypeRepository.findAll();
 
         Model model;
         try {
@@ -105,11 +105,11 @@ public class TrainGarageIndexer {
     }
 
     public Train tryToFetchTrain(String uri) {
-        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        final List<TrainType> trainTypes = trainTypeRepository.findAll();
         try {
             final Model model = baseIndexer.makeRequest(uri);
             final List<Train> trains = extractTrains(null, model, trainTypes);
-            if (trains.size() > 0) {
+            if (!trains.isEmpty()) {
                 return trains.get(0);
             }
         }

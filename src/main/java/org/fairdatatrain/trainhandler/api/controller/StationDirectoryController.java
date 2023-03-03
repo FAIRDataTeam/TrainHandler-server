@@ -30,6 +30,7 @@ import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.stationdirectory.StationDirectoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +51,7 @@ public class StationDirectoryController {
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<StationDirectoryDTO> getPaged(
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            Pageable pageable) {
+            @PageableDefault(sort = "displayName") Pageable pageable) {
         return stationDirectoryService.getPaged(query, pageable);
     }
 

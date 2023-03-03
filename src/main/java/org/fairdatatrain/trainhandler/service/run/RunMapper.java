@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,6 +47,9 @@ import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 @Component
 @RequiredArgsConstructor
 public class RunMapper {
+
+    private static final Comparator<JobSimpleDTO> JOB_SIMPLE_CMP =
+            Comparator.comparing((JobSimpleDTO item) -> item.getTarget().getTitle());
 
     private final PlanMapper planMapper;
 
@@ -84,6 +88,7 @@ public class RunMapper {
                 .getJobs()
                 .stream()
                 .map(jobMapper::toSimpleDTO)
+                .sorted(JOB_SIMPLE_CMP)
                 .toList();
         return RunDTO.builder()
                 .uuid(run.getUuid())

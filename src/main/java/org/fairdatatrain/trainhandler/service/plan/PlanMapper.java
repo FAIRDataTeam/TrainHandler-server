@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.UUID;
 
 import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
@@ -40,6 +41,9 @@ import static org.fairdatatrain.trainhandler.utils.TimeUtils.now;
 @Component
 @RequiredArgsConstructor
 public class PlanMapper {
+
+    private static final Comparator<PlanTargetDTO> TARGET_CMP =
+            Comparator.comparing((PlanTargetDTO item) -> item.getStation().getTitle());
 
     private final TrainMapper trainMapper;
 
@@ -55,7 +59,9 @@ public class PlanMapper {
                         plan.getTargets()
                                 .stream()
                                 .map(this::toPlanTargetDTO)
-                                .toList())
+                                .sorted(TARGET_CMP)
+                                .toList()
+                )
                 .publishArtifacts(plan.getPublishArtifacts())
                 .createdAt(plan.getCreatedAt().toInstant().toString())
                 .updatedAt(plan.getUpdatedAt().toInstant().toString())
@@ -72,6 +78,7 @@ public class PlanMapper {
                         plan.getTargets()
                                 .stream()
                                 .map(this::toPlanTargetDTO)
+                                .sorted(TARGET_CMP)
                                 .toList()
                 )
                 .publishArtifacts(plan.getPublishArtifacts())

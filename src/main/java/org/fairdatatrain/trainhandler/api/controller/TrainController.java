@@ -33,6 +33,7 @@ import org.fairdatatrain.trainhandler.exception.NotFoundException;
 import org.fairdatatrain.trainhandler.service.train.TrainService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +54,7 @@ public class TrainController {
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<TrainSimpleDTO> getPaged(
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            Pageable pageable) {
+            @PageableDefault(sort = "title") Pageable pageable) {
         return trainService.getPaged(query, pageable);
     }
 

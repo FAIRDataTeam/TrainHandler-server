@@ -89,7 +89,7 @@ public class StationDirectoryIndexer {
         final Set<String> visitedUris = new HashSet<>();
         final Queue<String> toVisitUris = new LinkedList<>();
         final List<Station> stations = new ArrayList<>();
-        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        final List<TrainType> trainTypes = trainTypeRepository.findAll();
 
         Model model;
         try {
@@ -126,7 +126,7 @@ public class StationDirectoryIndexer {
     }
 
     public Station tryToFetchStation(String uri) {
-        final List<TrainType> trainTypes = trainTypeRepository.findAllBy();
+        final List<TrainType> trainTypes = trainTypeRepository.findAll();
         try {
             final Model model = baseIndexer.makeRequest(uri);
             final List<Station> stations = extractStations(null, model, trainTypes);

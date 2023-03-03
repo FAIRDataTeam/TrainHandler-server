@@ -35,6 +35,7 @@ import org.fairdatatrain.trainhandler.service.plan.PlanService;
 import org.fairdatatrain.trainhandler.service.run.RunService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,7 +58,7 @@ public class PlanController {
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<PlanSimpleDTO> getPaged(
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
-            Pageable pageable) {
+            @PageableDefault(sort = "displayName") Pageable pageable) {
         return planService.getPaged(query, pageable);
     }
 
