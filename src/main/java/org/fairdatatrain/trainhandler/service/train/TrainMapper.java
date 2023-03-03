@@ -61,6 +61,7 @@ public class TrainMapper {
                 .keywords(
                         Arrays.stream(train.getKeywords().split(KEYWORD_SEP))
                                 .map(String::trim)
+                                .filter(item -> !item.isBlank())
                                 .toList())
                 .status(train.getStatus())
                 .softDeleted(train.getSoftDeleted())
@@ -90,6 +91,7 @@ public class TrainMapper {
                 .keywords(
                         Arrays.stream(train.getKeywords().split(KEYWORD_SEP))
                                 .map(String::trim)
+                                .filter(item -> !item.isBlank())
                                 .toList())
                 .status(train.getStatus())
                 .garage(

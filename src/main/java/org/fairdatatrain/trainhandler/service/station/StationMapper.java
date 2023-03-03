@@ -61,6 +61,7 @@ public class StationMapper {
                 .keywords(
                         Arrays.stream(station.getKeywords().split(KEYWORD_SEP))
                                 .map(String::trim)
+                                .filter(item -> !item.isBlank())
                                 .toList())
                 .endpointUrl(station.getEndpointUrl())
                 .endpointDescription(station.getEndpointDescription())
@@ -92,6 +93,7 @@ public class StationMapper {
                 .keywords(
                         Arrays.stream(station.getKeywords().split(KEYWORD_SEP))
                                 .map(String::trim)
+                                .filter(item -> !item.isBlank())
                                 .toList())
                 .endpointUrl(station.getEndpointUrl())
                 .endpointDescription(station.getEndpointDescription())
