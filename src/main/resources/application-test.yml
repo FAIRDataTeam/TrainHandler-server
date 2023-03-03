@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/train_handler_test
+    username: postgres
+    password: password
+
+keycloak:
+  enabled: false

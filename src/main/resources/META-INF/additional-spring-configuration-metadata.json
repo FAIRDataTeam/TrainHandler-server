@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "dispatcher.polling.timeout",
+      "type": "java.lang.String",
+      "description": "HTTP Long polling timeout (ISO-8601 duration)"
+    },
+    {
+      "name": "dispatcher.dispatch.root",
+      "type": "java.lang.String",
+      "description": "Root URL for composing callback URLs"
+    },
+    {
+      "name": "dispatcher.dispatch.initDelay",
+      "type": "java.lang.String",
+      "description": "Initial delay for periodic dispatching task (ISO-8601 duration)"
+    },
+    {
+      "name": "dispatcher.dispatch.interval",
+      "type": "java.lang.String",
+      "description": "Interval for periodic dispatching task (ISO-8601 duration)"
+    }
+  ]
+}

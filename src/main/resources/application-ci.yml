@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/train-handler-test
+    username: train-handler
+    password: password

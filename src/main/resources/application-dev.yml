@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/train_handler
+    username: postgres
+    password: password
+  flyway:
+    locations: classpath:db/migration,classpath:dev/db/migration
+
+keycloak:
+  enabled: false
+  realm: myrealm
+  auth-server-url: http://localhost:8000
+  resource: myapi
+  public-client: true
+  bearer-only: true
+
+dispatcher:
+  dispatch:
+    root: http://localhost:8080
+
+logging:
+  level:
+    com.zaxxer.hikari: TRACE
