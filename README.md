@@ -6,7 +6,25 @@
 
 Train Handler is intended to be used together with [client](https://github.com/FAIRDataTeam/TrainHandler-client) via Docker (unless for development purposes).
 
-*To be done: repository with docker-compose and configuration*
+The intended use is via Docker and Docker Compose, configured via envvars:
+
+```yaml
+  trainhandler-server:
+    image: fairdata/trainhandler-server:latest
+    restart: unless-stopped
+    # volumes:
+    #   - ${PROJECT_ROOT}/application.yml:/app/application.yml:ro
+    environment:
+      FDT_DISPATCH_ROOT: ${API_URL}
+      FDT_DISPATCH_INTERVAL: PT60S
+      FDT_POSTGRES_DB: ${POSTGRES_DB}
+      FDT_POSTGRES_USERNAME: ${POSTGRES_USER}
+      FDT_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      FDT_KEYCLOAK_ENABLED: true
+      FDT_KEYCLOAK_URL: ${KEYCLOAK_URL}
+      FDT_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      FDT_KEYCLOAK_RESOURCE: ${KEYCLOAK_CLIENT_API}
+```
 
 ## Development
 

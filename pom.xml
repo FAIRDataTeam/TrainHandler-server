@@ -11,7 +11,7 @@
 
     <groupId>org.fairdatatrain</groupId>
     <artifactId>trainhandler</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
 
     <name>Train Handler</name>
     <description>FAIR Data Train Handler</description>
@@ -47,10 +47,6 @@
         <plugin.spotbugs.version>4.7.3.2</plugin.spotbugs.version>
         <plugin.git_commit_id.version>5.0.0</plugin.git_commit_id.version>
         <plugin.rdf4j_generator.version>0.2.0</plugin.rdf4j_generator.version>
-        
-        <!-- override for security -->
-        <snakeyaml.version>1.33</snakeyaml.version>
-        <spring-security.version>5.8.1</spring-security.version>
     </properties>
 
     <dependencies>
